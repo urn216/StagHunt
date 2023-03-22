@@ -1,5 +1,6 @@
 package code.core;
 
+import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
@@ -11,6 +12,7 @@ public record ValueIterator(MDP mdp, int numIterations) {
 
   public double[] doValueIterationStep(double[] V) {
     double[][] Q = calculateQs(V);
+    System.out.println(Arrays.deepToString(Q));
     return calculateNextVs(Q);
   }
 
