@@ -51,6 +51,8 @@ public record ValueIterator(MDP mdp, int numIterations) {
   }
 
   private double calculateQ(int s, int a, double[] V) {
-    return mdp.R()[s][a] + mdp.gamma()*(IntStream.range(0, mdp.numStates()).mapToDouble((sPrime) -> {return mdp.T()[s][a][sPrime]*V[sPrime];}).sum());
+    return (IntStream.range(0, mdp.numStates()).mapToDouble((sPrime) -> {
+      return mdp.T()[s][a][sPrime]*(mdp.R()[s][a][sPrime] + mdp.gamma()*V[sPrime]);
+    }).sum());
   }
 }
