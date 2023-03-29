@@ -1,7 +1,7 @@
 package code.core;
 
 import code.math.Vector2;
-
+import code.mdp.OOMDP;
 import code.ui.UIColours;
 import code.ui.UIController;
 import code.ui.UIHelp;
@@ -12,6 +12,8 @@ import code.ui.components.UIInteractable;
 import code.ui.components.UIText;
 import code.ui.components.interactables.*;
 import code.ui.elements.*;
+import code.world.Action;
+import code.world.State;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -42,19 +44,44 @@ class UICreator {
     
     UIElement outPanel = new ElemList(
     new Vector2(0   , 0.28),
-    new Vector2(0.24, 0.28+UIHelp.calculateListHeightDefault(3, BUFFER_HEIGHT, COMPON_HEIGHT)),
+    new Vector2(0.24, 0.28+UIHelp.calculateListHeightDefault(2, BUFFER_HEIGHT, COMPON_HEIGHT)),
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
-      new UIButton("Play"           , () -> UIController.setState(UIState.NEW_GAME)),
-      new UIButton("Options"        , () -> UIController.setState(UIState.OPTIONS) ),
-      new UIButton("Quit to Desktop", Core::quitToDesk                            ),
+      new UIButton("Run VI"         , () -> UIController.setState(UIState.NEW_GAME)),
+      new UIButton("Quit to Desktop", Core::quitToDesk                             ),
     },
     new boolean[]{false, false, true, false}
     );
     
-    mainMenu.addState(UIState.DEFAULT, title   );
-    mainMenu.addState(UIState.DEFAULT, outPanel);
+    UIElement newGame = new ElemList(
+    new Vector2(0   , 0.28),
+    new Vector2(0.24, 0.28+UIHelp.calculateListHeightDefault(4, BUFFER_HEIGHT, COMPON_HEIGHT)),
+    COMPON_HEIGHT,
+    BUFFER_HEIGHT,
+    new UIInteractable[]{
+      new UIButton("Begin", () -> {
+        Core.mdp = new OOMDP(
+          0.9,
+          new Action[] {
+            (a) -> {return a.toggleBool(0);},
+            (a) -> {return a.getState();},
+            (a) -> {return a.leave();}
+          },
+          0
+        );
+        Core.doVI();
+      }),
+      new UISlider("Num Actors: %d", State::getNumActors, (a) -> {State.setNumActors(a); Core.s = State.decode(0);}, 1, 10),
+      new UIButton("Back", UIController::back),
+    },
+    new boolean[]{false, false, true, false}
+    );
+    
+    mainMenu.addState(UIState.DEFAULT,  title   );
+    mainMenu.addState(UIState.DEFAULT,  outPanel);
+    mainMenu.addState(UIState.NEW_GAME, title    , UIState.DEFAULT);
+    mainMenu.addState(UIState.NEW_GAME, newGame );
     
     mainMenu.clear();
     

@@ -1,36 +1,106 @@
 package code.core;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.Arrays;
 
 import code.math.ValueIterator;
+import code.mdp.ClassicMDP;
 import code.mdp.MDP;
-import code.mdp.OOMDP;
 import code.ui.UIController;
 import code.world.State;
 
 public abstract class Core {
 
+  private static final double COST_OF_LIVING  = -0.1;
+  private static final double COST_OF_FAILING = -10;
+  
   public static final Window WINDOW = new Window();
   
   private static final double TICKS_PER_SECOND = 60;
   private static final double MILLISECONDS_PER_TICK = 1000/TICKS_PER_SECOND;
-
-  private static final double COST_OF_LIVING  = -0.1;
-  private static final double COST_OF_FAILING = -10;
-
+  
   private static boolean quit = false;
-
-  private static MDP mdp = new OOMDP(
-    0.9, State.numberOfStates(), 
-    null, 
-    null, 
-    null
+  
+  static MDP mdp = new ClassicMDP(
+    0.9, 3, 3, 
+    new double[][][] { // Transition Matrix
+      { // hare hunting
+        { // toggle mode
+          0, 1, 0
+        },
+        { // pass
+          1, 0, 0
+        },
+        { // exit
+          0, 0, 1
+        }
+      },
+      { // stag hunting
+        { // toggle mode
+          1, 0, 0
+        },
+        { // pass
+          0, 1, 0
+        },
+        { // exit
+          0, 0, 1
+        }
+      },
+      { // exited
+        { // toggle mode
+          0, 0, 0
+        },
+        { // pass
+          0, 0, 0
+        },
+        { // exit
+          0, 0, 0
+        }
+      }
+    }, 
+    new double[][][] { // Reward Matrix
+      { // hare hunting
+        { // toggle mode
+          COST_OF_FAILING, COST_OF_LIVING, COST_OF_FAILING
+        },
+        { // pass
+          COST_OF_LIVING, COST_OF_FAILING, COST_OF_FAILING
+        },
+        { // exit
+          COST_OF_FAILING, COST_OF_FAILING, 3
+        }
+      },
+      { // stag hunting
+        { // toggle mode
+          COST_OF_LIVING, COST_OF_FAILING, COST_OF_FAILING
+        },
+        { // pass
+          COST_OF_FAILING, COST_OF_LIVING, COST_OF_FAILING
+        },
+        { // exit
+          COST_OF_FAILING, COST_OF_FAILING, 4
+        }
+      },
+      { // exited
+        { // toggle mode
+          0, 0, 0
+        },
+        { // pass
+          0, 0, 0
+        },
+        { // exit
+          0, 0, 0
+        }
+      }
+    }
   );
-
-  private static int numIterations = 10;
-
+  
+  static State s = State.decode(Integer.MAX_VALUE);
+  
+  private static int numIterations = 3;
+  
   static {
     WINDOW.setFullscreen(false);
     
@@ -39,12 +109,15 @@ public abstract class Core {
     UIController.setCurrentPane("Main Menu");
     Controls.initialiseControls(WINDOW.FRAME);
   }
-
+  
   public static void main(String[] args) {
-    run();
-
     ValueIterator vi = new ValueIterator(mdp, numIterations);
-
+    System.out.println(Arrays.toString(vi.doValueIteration()));
+    run();
+  }
+  
+  public static void doVI() {
+    ValueIterator vi = new ValueIterator(mdp, numIterations);
     System.out.println(Arrays.toString(vi.doValueIteration()));
   }
   
@@ -65,7 +138,7 @@ public abstract class Core {
       if (quit) {
         System.exit(0);
       }
-
+      
       WINDOW.PANEL.repaint();
       tickTime = System.currentTimeMillis() - tickTime;
       try {
@@ -73,7 +146,7 @@ public abstract class Core {
       } catch(InterruptedException e){System.out.println(e); System.exit(0);}
     }
   }
-
+  
   /**
   * Paints the contents of the program to the given {@code Graphics} object.
   * 
@@ -81,6 +154,13 @@ public abstract class Core {
   */
   public static void paintComponent(Graphics gra) {
     Graphics2D g = (Graphics2D)gra;
+    
+    g.setColor(new Color(173, 173, 173));
+    
+    g.fillRect(0, 0, WINDOW.screenWidth(), WINDOW.screenHeight());
+    
+    s.draw(g);
+    
     UIController.draw(g, WINDOW.screenWidth(), WINDOW.screenHeight());
   }
 }
@@ -89,76 +169,76 @@ public abstract class Core {
 ///////// Hard-Coded One-Man Stag Hunt /////////
 ////////                              //////////
 //
-// private static MDP mdp = new MDP(
+// private static MDP mdp = new ClassicMDP(
 //     0.9, 3, 3, 
 //     new double[][][] { // Transition Matrix
-//       { // hare hunting
-//         { // toggle mode
-//           0, 1, 0
-//         },
-//         { // pass
-//           1, 0, 0
-//         },
-//         { // exit
-//           0, 0, 1
-//         }
-//       },
-//       { // stag hunting
-//         { // toggle mode
-//           1, 0, 0
-//         },
-//         { // pass
-//           0, 1, 0
-//         },
-//         { // exit
-//           0, 0.01, 0.99
-//         }
-//       },
-//       { // exited
-//         { // toggle mode
-//           0, 0, 0
-//         },
-//         { // pass
-//           0, 0, 0
-//         },
-//         { // exit
-//           0, 0, 0
-//         }
-//       }
-//     }, 
-//     new double[][][] { // Reward Matrix
-//       { // hare hunting
-//         { // toggle mode
-//           COST_OF_FAILING, COST_OF_LIVING, COST_OF_FAILING
-//         },
-//         { // pass
-//           COST_OF_LIVING, COST_OF_FAILING, COST_OF_FAILING
-//         },
-//         { // exit
-//           COST_OF_FAILING, COST_OF_FAILING, 3
-//         }
-//       },
-//       { // stag hunting
-//         { // toggle mode
-//           COST_OF_LIVING, COST_OF_FAILING, COST_OF_FAILING
-//         },
-//         { // pass
-//           COST_OF_FAILING, COST_OF_LIVING, COST_OF_FAILING
-//         },
-//         { // exit
-//           COST_OF_FAILING, COST_OF_FAILING, 4
-//         }
-//       },
-//       { // exited
-//         { // toggle mode
-//           0, 0, 0
-//         },
-//         { // pass
-//           0, 0, 0
-//         },
-//         { // exit
-//           0, 0, 0
-//         }
-//       }
-//     }
-//   );
+  //       { // hare hunting
+    //         { // toggle mode
+      //           0, 1, 0
+      //         },
+      //         { // pass
+        //           1, 0, 0
+        //         },
+        //         { // exit
+          //           0, 0, 1
+          //         }
+          //       },
+          //       { // stag hunting
+            //         { // toggle mode
+              //           1, 0, 0
+              //         },
+              //         { // pass
+                //           0, 1, 0
+                //         },
+                //         { // exit
+                  //           0, 0.01, 0.99
+                  //         }
+                  //       },
+                  //       { // exited
+                    //         { // toggle mode
+                      //           0, 0, 0
+                      //         },
+                      //         { // pass
+                        //           0, 0, 0
+                        //         },
+                        //         { // exit
+                          //           0, 0, 0
+                          //         }
+                          //       }
+                          //     }, 
+                          //     new double[][][] { // Reward Matrix
+                            //       { // hare hunting
+                              //         { // toggle mode
+                                //           COST_OF_FAILING, COST_OF_LIVING, COST_OF_FAILING
+                                //         },
+                                //         { // pass
+                                  //           COST_OF_LIVING, COST_OF_FAILING, COST_OF_FAILING
+                                  //         },
+                                  //         { // exit
+                                    //           COST_OF_FAILING, COST_OF_FAILING, 3
+                                    //         }
+                                    //       },
+                                    //       { // stag hunting
+                                      //         { // toggle mode
+                                        //           COST_OF_LIVING, COST_OF_FAILING, COST_OF_FAILING
+                                        //         },
+                                        //         { // pass
+                                          //           COST_OF_FAILING, COST_OF_LIVING, COST_OF_FAILING
+                                          //         },
+                                          //         { // exit
+                                            //           COST_OF_FAILING, COST_OF_FAILING, 4
+                                            //         }
+                                            //       },
+                                            //       { // exited
+                                              //         { // toggle mode
+                                                //           0, 0, 0
+                                                //         },
+                                                //         { // pass
+                                                  //           0, 0, 0
+                                                  //         },
+                                                  //         { // exit
+                                                    //           0, 0, 0
+                                                    //         }
+                                                    //       }
+                                                    //     }
+                                                    //   );
