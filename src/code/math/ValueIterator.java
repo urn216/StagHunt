@@ -1,8 +1,10 @@
-package code.core;
+package code.math;
 
 import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+
+import code.mdp.MDP;
 
 public record ValueIterator(MDP mdp, int numIterations) {
 
