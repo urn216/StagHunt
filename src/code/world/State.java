@@ -16,7 +16,7 @@ import code.math.Vector2;
  */
 public class State {
 
-  private static int numActors = 10;
+  private static int numActors = 1;
 
   /**
    * Decodes an {@code int} into its underlying {@code State}.
@@ -26,7 +26,7 @@ public class State {
    * @return a {@code State} represented by the given {@code int}
    */
   public static State decode(int state) {
-    if (state >= numberOfStates()-1) return new State();
+    if (state >= exitStateEncoded()) return new State();
 
     Actor[] actors = new Actor[numActors];
 
@@ -47,7 +47,7 @@ public class State {
    * @return a uniquely identifiable {@code int} representation of the given {@code State}
    */
   public static int encode(State state) {
-    if (state.actors.length == 0) return numberOfStates()-1;
+    if (state.actors.length == 0) return exitStateEncoded();
 
     int res = 0;
 
@@ -74,6 +74,10 @@ public class State {
    */
   public static int numberOfStates() {
     return (1 << (numActors * Actor.size())) + 1;
+  }
+
+  public static int exitStateEncoded() {
+    return numberOfStates()-1;
   }
 
   /**

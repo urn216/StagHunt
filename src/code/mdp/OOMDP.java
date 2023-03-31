@@ -19,30 +19,26 @@ public class OOMDP implements MDP {
       State state = State.decode(s);
 
       // Find all the valid actions this actor can perform from this state
-      for (int a = 0; a < actions.length-1; a++) {
+      for (int a = 0; a < actions.length; a++) {
+        //get the destination State
         State nextState = null;
+
         try {
           nextState = actions[a].act(state.getActors()[actor]);
-        } catch (Exception e) {continue;}
+        } catch (Exception e) {}
 
         if (nextState == null) continue;
+        //
 
         int sPrime = State.encode(nextState);
 
+        // Probability of success constant for now
         T[s][a][sPrime] = 1;
-        R[s][a][sPrime] = COST_OF_LIVING;
+        // If we exited, claim reward, otherwise keep chugging
+        R[s][a][sPrime] = sPrime == State.exitStateEncoded() ? 
+          state.getActors()[actor].exitReward() :
+          COST_OF_LIVING;
       }
-
-      // Exit if possible, and collect rewards
-      try {
-        State nextState = actions[actions.length-1].act(state.getActors()[actor]);
-        int sPrime = State.encode(nextState);
-        T[s][actions.length-1][sPrime] = 1;
-        // If we exited, claim reward
-        if (sPrime == State.numberOfStates()-1) R[s][actions.length-1][sPrime] = state.getActors()[actor].exitReward();
-        // Otherwise we keep chugging
-        else R[s][actions.length-1][sPrime] = COST_OF_LIVING;
-      } catch (Exception e) {continue;}
     }
 
     underlay = new ClassicMDP(gamma, sTot, aTot, T, R);
