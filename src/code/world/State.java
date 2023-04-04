@@ -167,12 +167,12 @@ public class State {
     int sw = Core.WINDOW.screenWidth();
     int sh = Core.WINDOW.screenHeight();
 
-    g.setColor(Color.BLACK);
+    g.setColor(Color.white);
 
     g.drawOval((sw - sh)/2, 0, sh, sh);
 
     for (int i = 0; i < actors.length; i++) {
-      actors[i].draw(g, (int)(actorPs[i].x*sh+sw/2), (int)(actorPs[i].y*sh+sh/2), 100);
+      actors[i].draw(g, (int)(actorPs[i].x*sh+sw/2), (int)(actorPs[i].y*sh+sh/2), sh/8);
     }
   }
 }

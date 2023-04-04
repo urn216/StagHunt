@@ -155,7 +155,7 @@ public abstract class Core {
   public static void paintComponent(Graphics gra) {
     Graphics2D g = (Graphics2D)gra;
     
-    g.setColor(new Color(173, 173, 173));
+    g.setColor(Color.black);
     
     g.fillRect(0, 0, WINDOW.screenWidth(), WINDOW.screenHeight());
     

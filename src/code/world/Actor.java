@@ -1,9 +1,12 @@
 package code.world;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 
+import code.core.Core;
 import code.math.MathHelp;
 
 /**
@@ -17,6 +20,9 @@ public class Actor {
   private final State state;
   private final int actorNum;
 
+  private final Color colourBody;
+  private final Color colourText;
+
   /**
    * Creates a new {@code Actor} with given parameters.
    * 
@@ -26,6 +32,8 @@ public class Actor {
     this.state = state;
     this.actorNum = actorNum;
     this.huntStag = huntStag;
+    this.colourBody = Color.getHSBColor(1f*actorNum/State.getNumActors(), 1, 1);
+    this.colourText = colourBody.darker().darker().darker();
   }
 
   /**
@@ -71,13 +79,18 @@ public class Actor {
   public static int size() {return 1;}
 
   public void draw(Graphics2D g, int x, int y, int size) {
-    g.setColor(Color.BLUE);
+    g.setStroke(new BasicStroke(Core.WINDOW.screenHeight()/128));
+    g.setFont(new Font(Font.MONOSPACED, Font.BOLD, size/2));
+    g.setColor(colourBody);
+    
     g.fillOval(x-size/2, y-size/2, size, size);
-    g.setColor(Color.CYAN);
+    g.setColor(colourText);
     g.drawOval(x-size/2, y-size/2, size, size);
-    g.setColor(Color.BLACK);
-    g.setFont(new Font(Font.SERIF, Font.BOLD, size/2));
+
+    FontMetrics met = g.getFontMetrics();
     char c = huntStag ? 'S' : 'H';
-    g.drawString(c+"", x-g.getFontMetrics().charWidth(c)/2, y+g.getFontMetrics().getDescent()+g.getFontMetrics().getLeading());
+
+    g.drawString(c+"", x-met.charWidth(c)/2, y+met.getDescent()+met.getLeading());
+    g.setStroke(new BasicStroke(1));
   }
 }

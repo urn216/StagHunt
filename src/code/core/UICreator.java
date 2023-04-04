@@ -72,7 +72,7 @@ class UICreator {
         );
         Core.doVI();
       }),
-      new UISlider("Num Actors: %d", State::getNumActors, (a) -> {State.setNumActors(a); Core.s = State.decode(0);}, 1, 10),
+      new UISlider("Num Actors: %d", State::getNumActors, (a) -> {State.setNumActors(a); Core.s = State.decode(0);}, 1, 12),
       new UIButton("Back", UIController::back),
     },
     new boolean[]{false, false, true, false}
