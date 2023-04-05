@@ -23,8 +23,14 @@ public abstract class Core {
   
   private static boolean quit = false;
   
+  private static State state = State.decode(Integer.MAX_VALUE);
+
+  private static double gamma = 0.9;
+  
+  private static int numIterations = 3;
+  
   static MDP mdp = new ClassicMDP(
-    0.9, 3, 3, 
+    gamma, 3, 3, 
     new double[][][] { // Transition Matrix
       { // hare hunting
         { // toggle mode
@@ -97,10 +103,6 @@ public abstract class Core {
     }
   );
   
-  static State s = State.decode(Integer.MAX_VALUE);
-  
-  private static int numIterations = 3;
-  
   static {
     WINDOW.setFullscreen(false);
     
@@ -159,8 +161,24 @@ public abstract class Core {
     
     g.fillRect(0, 0, WINDOW.screenWidth(), WINDOW.screenHeight());
     
-    s.draw(g);
+    state.draw(g);
     
     UIController.draw(g, WINDOW.screenWidth(), WINDOW.screenHeight());
+  }
+
+  public static double getGamma() {
+    return gamma;
+  }
+
+  public static void setGamma(double gamma) {
+    Core.gamma = gamma;
+  }
+
+  public static State getState() {
+    return state;
+  }
+
+  public static void setState(State state) {
+    Core.state = state;
   }
 }

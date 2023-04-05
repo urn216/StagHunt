@@ -1,2 +1,2 @@
 Main-Class: code/core/Core
-Class-Path: ../data/UI_1.0.1.jar
+Class-Path: ../data/UI_1.0.2.jar

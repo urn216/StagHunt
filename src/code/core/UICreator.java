@@ -48,7 +48,7 @@ class UICreator {
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
-      new UIButton("Value Iterator" , () -> {UIController.setState(UIState.NEW_GAME); Core.s = State.decode(0);}),
+      new UIButton("Value Iterator" , () -> {UIController.setState(UIState.NEW_GAME); Core.setState(State.decode(0));}),
       new UIButton("Quit to Desktop", Core::quitToDesk),
     },
     new boolean[]{false, false, true, false}
@@ -56,13 +56,13 @@ class UICreator {
     
     UIElement newGame = new ElemList(
     new Vector2(0   , 0.28),
-    new Vector2(0.24, 0.28+UIHelp.calculateListHeightDefault(4, BUFFER_HEIGHT, COMPON_HEIGHT)),
+    new Vector2(0.2, 0.28+UIHelp.calculateListHeight(BUFFER_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT*2, COMPON_HEIGHT*2, COMPON_HEIGHT)),
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
       new UIButton("Begin", () -> {
         Core.mdp = new OOMDP(
-          0.9,
+          Core.getGamma(),
           new Action[] {
             (a) -> {return a.toggleBool(0);},
             (a) -> {return a.getState();},
@@ -72,8 +72,9 @@ class UICreator {
         );
         Core.doVI();
       }),
-      new UISlider("Num Actors: %d", State::getNumActors, (a) -> {State.setNumActors(a); Core.s = State.decode(0);}, 1, 12),
-      new UIButton("Back", () -> {UIController.back(); Core.s = State.decode(Integer.MAX_VALUE);}),
+      new UISlider.Double("Gamma: %.2f", Core::getGamma, Core::setGamma, 0, 1),
+      new UISlider.Integer("Num Actors: %.0f", State::getNumActors, (a) -> {State.setNumActors(a); Core.setState(State.decode(0));}, 1, 12),
+      new UIButton("Back", () -> {UIController.back(); Core.setState(State.decode(Integer.MAX_VALUE));}),
     },
     new boolean[]{false, false, true, false}
     );
