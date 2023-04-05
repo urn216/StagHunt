@@ -32,8 +32,11 @@ public class Actor {
     this.state = state;
     this.actorNum = actorNum;
     this.huntStag = huntStag;
-    this.colourBody = Color.getHSBColor(1f*actorNum/State.getNumActors(), 1, 1);
-    this.colourText = colourBody.darker().darker().darker();
+
+    float percentAround = 1f*actorNum/State.getNumActors();
+
+    this.colourBody = Color.getHSBColor(percentAround, 1, 1   );
+    this.colourText = Color.getHSBColor(percentAround, 1, 0.4f);
   }
 
   /**

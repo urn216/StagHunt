@@ -18,6 +18,9 @@ public class State {
 
   private static int numActors = 1;
 
+  private static Decal deer = new Decal("icon.png", 0.5, 0.5, 0.6);
+  private static Color deerColour = new Color(27, 0, 15);
+
   /**
    * Decodes an {@code int} into its underlying {@code State}.
    * 
@@ -167,8 +170,15 @@ public class State {
     int sw = Core.WINDOW.screenWidth();
     int sh = Core.WINDOW.screenHeight();
 
-    g.setColor(Color.white);
+    if (actors.length == 0) {
+      g.setColor(deerColour);
+      g.fillOval((int)((sw - sh)/2 + 0.195*sh), (int)(0.195*sh), (int)(sh*0.61), (int)(sh*0.61));
+  
+      deer.draw(g);
+      return;
+    }
 
+    g.setColor(Color.white);
     g.drawOval((sw - sh)/2, 0, sh, sh);
 
     for (int i = 0; i < actors.length; i++) {

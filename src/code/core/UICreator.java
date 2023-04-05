@@ -48,8 +48,8 @@ class UICreator {
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
-      new UIButton("Run VI"         , () -> UIController.setState(UIState.NEW_GAME)),
-      new UIButton("Quit to Desktop", Core::quitToDesk                             ),
+      new UIButton("Value Iterator" , () -> {UIController.setState(UIState.NEW_GAME); Core.s = State.decode(0);}),
+      new UIButton("Quit to Desktop", Core::quitToDesk),
     },
     new boolean[]{false, false, true, false}
     );
@@ -73,7 +73,7 @@ class UICreator {
         Core.doVI();
       }),
       new UISlider("Num Actors: %d", State::getNumActors, (a) -> {State.setNumActors(a); Core.s = State.decode(0);}, 1, 12),
-      new UIButton("Back", UIController::back),
+      new UIButton("Back", () -> {UIController.back(); Core.s = State.decode(Integer.MAX_VALUE);}),
     },
     new boolean[]{false, false, true, false}
     );
