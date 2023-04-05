@@ -1,9 +1,7 @@
 package code.world;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 
-import code.core.Core;
 import code.math.Vector2;
 
 /**
@@ -16,11 +14,6 @@ import code.math.Vector2;
  */
 public class State {
 
-  private static int numActors = 1;
-
-  private static Decal deer = new Decal("icon.png", 0.5, 0.5, 0.6);
-  private static Color deerColour = new Color(27, 0, 15);
-
   /**
    * Decodes an {@code int} into its underlying {@code State}.
    * 
@@ -31,7 +24,7 @@ public class State {
   public static State decode(int state) {
     if (state >= exitStateEncoded()) return new State();
 
-    Actor[] actors = new Actor[numActors];
+    Actor[] actors = new Actor[World.getNumActors()];
 
     State result = new State(actors);
 
@@ -54,7 +47,7 @@ public class State {
 
     int res = 0;
 
-    for (int i = 0; i < numActors; i++) {
+    for (int i = 0; i < World.getNumActors(); i++) {
       res |= state.actors[i].encode() << (i * Actor.size());
     }
 
@@ -67,7 +60,7 @@ public class State {
    * @return the number of bits required to represent a {@code State}
    */
   public static int size() {
-    return numActors*Actor.size() + 1;
+    return World.getNumActors()*Actor.size() + 1;
   }
 
   /**
@@ -76,29 +69,11 @@ public class State {
    * @return the total number of unique {@code State} objects.
    */
   public static int numberOfStates() {
-    return (1 << (numActors * Actor.size())) + 1;
+    return (1 << (World.getNumActors() * Actor.size())) + 1;
   }
 
   public static int exitStateEncoded() {
     return numberOfStates()-1;
-  }
-
-  /**
-   * Gets the total number of {@code Actor}s present in the current world
-   * 
-   * @return number of {@code Actor} objects each {@code Scene} will use
-   */
-  public static int getNumActors() {
-    return numActors;
-  }
-
-  /**
-   * Sets the total number of {@code Actor}s present in the current world
-   * 
-   * @param numActors number of {@code Actor} objects each {@code Scene} will use
-   */
-  public static void setNumActors(int numActors) {
-    State.numActors = numActors;
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -115,9 +90,9 @@ public class State {
    * {@code numActors} or empty to represent the 'exit' {@code State}
    */
   private State(Actor... actors) {
-    if (actors.length != numActors && actors.length != 0) {
+    if (actors.length != World.getNumActors() && actors.length != 0) {
       throw new RuntimeException(
-        "Invalid number of Actors! Expected " + numActors + ", but recieved " + actors.length
+        "Invalid number of Actors! Expected " + World.getNumActors() + ", but recieved " + actors.length
       );
     }
 
@@ -165,24 +140,9 @@ public class State {
     return State.decode(State.encode(this));
   }
 
-  public void draw(Graphics2D g) {
-
-    int sw = Core.WINDOW.screenWidth();
-    int sh = Core.WINDOW.screenHeight();
-
-    if (actors.length == 0) {
-      g.setColor(deerColour);
-      g.fillOval((int)((sw - sh)/2 + 0.195*sh), (int)(0.195*sh), (int)(sh*0.61), (int)(sh*0.61));
-  
-      deer.draw(g);
-      return;
-    }
-
-    g.setColor(Color.white);
-    g.drawOval((sw - sh)/2, 0, sh, sh);
-
+  public void draw(Graphics2D g, int width, int height) {
     for (int i = 0; i < actors.length; i++) {
-      actors[i].draw(g, (int)(actorPs[i].x*sh+sw/2), (int)(actorPs[i].y*sh+sh/2), sh/8);
+      actors[i].draw(g, (int)(actorPs[i].x*height+width/2), (int)(actorPs[i].y*height+height/2), height/8);
     }
   }
 }

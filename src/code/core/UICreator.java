@@ -14,6 +14,7 @@ import code.ui.components.interactables.*;
 import code.ui.elements.*;
 import code.world.Action;
 import code.world.State;
+import code.world.World;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -48,7 +49,7 @@ class UICreator {
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
-      new UIButton("Value Iterator" , () -> {UIController.setState(UIState.NEW_GAME); Core.setState(State.decode(0));}),
+      new UIButton("Value Iterator" , () -> {UIController.setState(UIState.NEW_GAME); World.setState(State.decode(0));}),
       new UIButton("Quit to Desktop", Core::quitToDesk),
     },
     new boolean[]{false, false, true, false}
@@ -56,25 +57,25 @@ class UICreator {
     
     UIElement newGame = new ElemList(
     new Vector2(0   , 0.28),
-    new Vector2(0.2, 0.28+UIHelp.calculateListHeight(BUFFER_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT*2, COMPON_HEIGHT*2, COMPON_HEIGHT)),
+    new Vector2(0.2 , 0.28+UIHelp.calculateListHeight(BUFFER_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT*2, COMPON_HEIGHT*2, COMPON_HEIGHT)),
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
       new UIButton("Begin", () -> {
-        Core.mdp = new OOMDP(
-          Core.getGamma(),
+        World.setMdp(new OOMDP(
+          World.getGamma(),
           new Action[] {
             (a) -> {return a.toggleBool(0);},
             (a) -> {return a.getState();},
             (a) -> {return a.leave();}
           },
           0
-        );
-        Core.doVI();
+        ));
+        World.doVI();
       }),
-      new UISlider.Double("Gamma: %.2f", Core::getGamma, Core::setGamma, 0, 1),
-      new UISlider.Integer("Num Actors: %.0f", State::getNumActors, (a) -> {State.setNumActors(a); Core.setState(State.decode(0));}, 1, 12),
-      new UIButton("Back", () -> {UIController.back(); Core.setState(State.decode(Integer.MAX_VALUE));}),
+      new UISlider.Double("Gamma: %.2f", World::getGamma, World::setGamma, 0, 1),
+      new UISlider.Integer("Num Actors: %.0f", World::getNumActors, (a) -> {World.setNumActors(a); World.setState(State.decode(0));}, 1, 12),
+      new UIButton("Back", () -> {UIController.back(); World.setState(null);}),
     },
     new boolean[]{false, false, true, false}
     );

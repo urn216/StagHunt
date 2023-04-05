@@ -100,6 +100,10 @@ abstract class Controls {
           Core.WINDOW.toggleFullscreen();
           return;
         }
+        if (keyCode == KeyEvent.VK_F2) {
+          Core.printWorld(1080);;
+          return;
+        }
         if (keyCode == KeyEvent.VK_ESCAPE) {
           UIController.release();
           UIController.back();

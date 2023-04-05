@@ -33,7 +33,7 @@ public class Actor {
     this.actorNum = actorNum;
     this.huntStag = huntStag;
 
-    float percentAround = 1f*actorNum/State.getNumActors();
+    float percentAround = 1f*actorNum/World.getNumActors();
 
     this.colourBody = Color.getHSBColor(percentAround, 1, 1   );
     this.colourText = Color.getHSBColor(percentAround, 1, 0.4f);

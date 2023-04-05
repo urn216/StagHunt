@@ -3,13 +3,15 @@ package code.core;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
+import code.math.IOHelp;
 import code.math.ValueIterator;
 import code.mdp.ClassicMDP;
 import code.mdp.MDP;
 import code.ui.UIController;
-import code.world.State;
+import code.world.World;
 
 public abstract class Core {
 
@@ -23,14 +25,8 @@ public abstract class Core {
   
   private static boolean quit = false;
   
-  private static State state = State.decode(Integer.MAX_VALUE);
-
-  private static double gamma = 0.9;
-  
-  private static int numIterations = 3;
-  
-  static MDP mdp = new ClassicMDP(
-    gamma, 3, 3, 
+  private static MDP mdp = new ClassicMDP(
+    0.9, 3, 3, 
     new double[][][] { // Transition Matrix
       { // hare hunting
         { // toggle mode
@@ -113,14 +109,9 @@ public abstract class Core {
   }
   
   public static void main(String[] args) {
-    ValueIterator vi = new ValueIterator(mdp, numIterations);
+    ValueIterator vi = new ValueIterator(mdp, 3);
     System.out.println(Arrays.toString(vi.doValueIteration()));
     run();
-  }
-  
-  public static void doVI() {
-    ValueIterator vi = new ValueIterator(mdp, numIterations);
-    System.out.println(Arrays.toString(vi.doValueIteration()));
   }
   
   /**
@@ -128,6 +119,12 @@ public abstract class Core {
   */
   public static void quitToDesk() {
     quit = true;
+  }
+
+  public static void printWorld(int size) {
+    BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+    World.draw(img.createGraphics(), size, size);
+    IOHelp.writeImage("../output.png", img);
   }
   
   /**
@@ -156,29 +153,15 @@ public abstract class Core {
   */
   public static void paintComponent(Graphics gra) {
     Graphics2D g = (Graphics2D)gra;
+
+    int sw = WINDOW.screenWidth(), sh = WINDOW.screenHeight();
     
     g.setColor(Color.black);
     
-    g.fillRect(0, 0, WINDOW.screenWidth(), WINDOW.screenHeight());
-    
-    state.draw(g);
+    g.fillRect(0, 0, sw, sh);
+
+    World.draw(g, sw, sh);
     
     UIController.draw(g, WINDOW.screenWidth(), WINDOW.screenHeight());
-  }
-
-  public static double getGamma() {
-    return gamma;
-  }
-
-  public static void setGamma(double gamma) {
-    Core.gamma = gamma;
-  }
-
-  public static State getState() {
-    return state;
-  }
-
-  public static void setState(State state) {
-    Core.state = state;
   }
 }
