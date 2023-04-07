@@ -6,11 +6,12 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
+import ui.control.UIController;
+
 import code.math.IOHelp;
 import code.math.ValueIterator;
 import code.mdp.ClassicMDP;
 import code.mdp.MDP;
-import code.ui.UIController;
 import code.world.World;
 
 public abstract class Core {
@@ -109,7 +110,7 @@ public abstract class Core {
   }
   
   public static void main(String[] args) {
-    ValueIterator vi = new ValueIterator(mdp, 3);
+    ValueIterator vi = new ValueIterator(mdp, 3, null);
     System.out.println(Arrays.toString(vi.doValueIteration()));
     run();
   }

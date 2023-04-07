@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import code.math.ValueIterator;
 import code.mdp.MDP;
+import code.mdp.OOMDP;
 
 public abstract class World {
 
@@ -13,15 +14,18 @@ public abstract class World {
   private static final Color deerColour = new Color(27, 0, 15);
 
   private static double gamma = 0.9;
-  private static int numActors = 1;
   private static State currentState = null;
 
-  private static MDP mdp = null;
+  private static int numActors = 1;
+  private static ValueIterator.Storage[] actorValues = new ValueIterator.Storage[0];
+  private static MDP[] actorMDPs = new MDP[0];
+
   private static int numMDPIterations = 3;
 
   public static void doVI() {
-    ValueIterator vi = new ValueIterator(mdp, numMDPIterations);
-    System.out.println(Arrays.toString(vi.doValueIteration()));
+    for (int i = 0; i < actorMDPs.length; i++) {
+      System.out.println(Arrays.toString(new ValueIterator(actorMDPs[i], numMDPIterations, actorValues[i]).doValueIteration()));
+    }
   }
 
   public static double getGamma() {
@@ -50,12 +54,25 @@ public abstract class World {
     World.numActors = numActors;
   }
 
-  public static MDP getMdp() {
-    return mdp;
+  public static MDP[] getActorMDPs() {
+    return actorMDPs;
   }
 
-  public static void setMdp(MDP mdp) {
-    World.mdp = mdp;
+  public static ValueIterator.Storage[] getActorValues() {
+    return actorValues;
+  }
+
+  public static void initialiseMDPs() {
+    actorMDPs = new MDP[numActors];
+    actorValues = new ValueIterator.Storage[numActors];
+    for (int i = 0; i < numActors; i++) {
+      actorMDPs[i] = new OOMDP( gamma, new Action[] {
+        (a) -> {return a.toggleBool(0);},
+        (a) -> {return a.getState();},
+        (a) -> {return a.leave();}
+      }, i);
+      actorValues[i] = new ValueIterator.Storage();
+    }
   }
 
   public static int getNumMDPIterations() {

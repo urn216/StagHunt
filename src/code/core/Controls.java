@@ -9,9 +9,8 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JFrame;
 
-import code.math.Vector2I;
-
-import code.ui.UIController;
+import ui.math.Vector2I;
+import ui.control.UIController;
 
 /**
  * Handles all user input within the game

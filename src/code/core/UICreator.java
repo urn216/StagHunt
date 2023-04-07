@@ -1,18 +1,17 @@
 package code.core;
 
-import code.math.Vector2;
-import code.mdp.OOMDP;
-import code.ui.UIColours;
-import code.ui.UIController;
-import code.ui.UIHelp;
-import code.ui.UIPane;
-import code.ui.UIState;
-import code.ui.components.UIComponent;
-import code.ui.components.UIInteractable;
-import code.ui.components.UIText;
-import code.ui.components.interactables.*;
-import code.ui.elements.*;
-import code.world.Action;
+import ui.math.Vector2;
+import ui.control.UIColours;
+import ui.control.UIController;
+import ui.control.UIHelp;
+import ui.control.UIPane;
+import ui.control.UIState;
+import ui.components.UIComponent;
+import ui.components.UIInteractable;
+import ui.components.UIText;
+import ui.components.interactables.*;
+import ui.elements.*;
+
 import code.world.State;
 import code.world.World;
 
@@ -61,19 +60,8 @@ class UICreator {
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
-      new UIButton("Begin", () -> {
-        World.setMdp(new OOMDP(
-          World.getGamma(),
-          new Action[] {
-            (a) -> {return a.toggleBool(0);},
-            (a) -> {return a.getState();},
-            (a) -> {return a.leave();}
-          },
-          0
-        ));
-        World.doVI();
-      }),
-      new UISlider.Double("Gamma: %.2f", World::getGamma, World::setGamma, 0, 1),
+      new UIButton("Begin", () -> {World.initialiseMDPs(); World.doVI();}),
+      new UISlider.Double("Gamma: %.2f", World::getGamma, World::setGamma, 0, 1, 0.01),
       new UISlider.Integer("Num Actors: %.0f", World::getNumActors, (a) -> {World.setNumActors(a); World.setState(State.decode(0));}, 1, 12),
       new UIButton("Back", () -> {UIController.back(); World.setState(null);}),
     },

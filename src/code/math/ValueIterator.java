@@ -6,16 +6,21 @@ import java.util.stream.IntStream;
 
 import code.mdp.MDP;
 
-public record ValueIterator(MDP mdp, int numIterations) {
+public record ValueIterator(MDP mdp, int numIterations, Storage store) {
 
   public double[] doValueIteration() {
     return doXValueIterationSteps(new double[mdp.numStates()], numIterations);
   }
 
   public double[] doValueIterationStep(double[] V) {
-    double[][] Q = calculateQs(V);
-    System.out.println(Arrays.deepToString(Q));
-    return calculateNextVs(Q);
+    double[][]   Q = calculateQs(V);
+    double[] nextV = calculateNextVs(Q);
+    if (store != null) {
+      store.Q = Q;
+      store.V = nextV;
+    }
+    else System.out.println(Arrays.deepToString(Q));
+    return nextV;
   }
 
   public double[] doXValueIterationSteps(double[] V, int numIterations) {
@@ -56,5 +61,10 @@ public record ValueIterator(MDP mdp, int numIterations) {
     return (IntStream.range(0, mdp.numStates()).mapToDouble((sPrime) -> {
       return mdp.T()[s][a][sPrime]*(mdp.R()[s][a][sPrime] + mdp.gamma()*V[sPrime]);
     }).sum());
+  }
+
+  public static class Storage {
+    public double[][] Q;
+    public double[]   V;
   }
 }
