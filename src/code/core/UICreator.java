@@ -62,7 +62,7 @@ class UICreator {
     new UIInteractable[]{
       new UIButton("Begin", () -> {World.initialiseMDPs(); World.doVI();}),
       new UISlider.Double("Gamma: %.2f", World::getGamma, World::setGamma, 0, 1, 0.01),
-      new UISlider.Integer("Num Actors: %.0f", World::getNumActors, (a) -> {World.setNumActors(a); World.setState(State.decode(0));}, 1, 12),
+      new UISlider.Integer("Num Actors: %.0f", World::getNumActors, (a) -> {World.setNumActors(a); World.setState(State.decode(0));}, 1, 10),
       new UIButton("Back", () -> {UIController.back(); World.setState(null);}),
     },
     new boolean[]{false, false, true, false}

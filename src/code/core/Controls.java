@@ -95,12 +95,12 @@ abstract class Controls {
         KEY_DOWN[keyCode] = true;
         
         // System.out.print(keyCode);
-        if (keyCode == KeyEvent.VK_F11) {
-          Core.WINDOW.toggleFullscreen();
+        if (keyCode == KeyEvent.VK_F2) {
+          Core.printWorld(1080);
           return;
         }
-        if (keyCode == KeyEvent.VK_F2) {
-          Core.printWorld(1080);;
+        if (keyCode == KeyEvent.VK_F11) {
+          Core.WINDOW.toggleFullscreen();
           return;
         }
         if (keyCode == KeyEvent.VK_ESCAPE) {

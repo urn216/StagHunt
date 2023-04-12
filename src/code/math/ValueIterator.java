@@ -66,5 +66,12 @@ public record ValueIterator(MDP mdp, int numIterations, Storage store) {
   public static class Storage {
     public double[][] Q;
     public double[]   V;
+
+    public int bestIndexAtState(int s) {
+      for (int i = 0; i < Q[s].length; i++) {
+        if (V[s] == Q[s][i]) return i;
+      }
+      return -1;
+    }
   }
 }

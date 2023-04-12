@@ -138,6 +138,11 @@ public abstract class Core {
       if (quit) {
         System.exit(0);
       }
+
+      if (Controls.KEY_DOWN[0x30]) {World.progressState(0); Controls.KEY_DOWN[0x30] = false;}
+      if (Controls.KEY_DOWN[0x31]) {World.progressState(1); Controls.KEY_DOWN[0x31] = false;}
+      if (Controls.KEY_DOWN[0x32]) {World.progressState(2); Controls.KEY_DOWN[0x32] = false;}
+      if (Controls.KEY_DOWN['\b']) {World.regressState();   Controls.KEY_DOWN['\b'] = false;}
       
       WINDOW.PANEL.repaint();
       tickTime = System.currentTimeMillis() - tickTime;

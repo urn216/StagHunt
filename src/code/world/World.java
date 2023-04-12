@@ -3,6 +3,7 @@ package code.world;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Arrays;
+import java.util.Stack;
 
 import code.math.ValueIterator;
 import code.mdp.MDP;
@@ -14,17 +15,25 @@ public abstract class World {
   private static final Color deerColour = new Color(27, 0, 15);
 
   private static double gamma = 0.9;
+
+  private static final Stack<State> stateHistory = new Stack<>();
   private static State currentState = null;
+  
+  private static Action[] possibleActions = {
+    (a) -> {return a.toggleBool(0);},
+    (a) -> {return a.getState();},
+    (a) -> {return a.leave();}
+  };
 
   private static int numActors = 1;
-  private static ValueIterator.Storage[] actorValues = new ValueIterator.Storage[0];
+  private static ValueIterator.Storage[] actorBrains = new ValueIterator.Storage[0];
   private static MDP[] actorMDPs = new MDP[0];
 
   private static int numMDPIterations = 3;
 
   public static void doVI() {
     for (int i = 0; i < actorMDPs.length; i++) {
-      System.out.println(Arrays.toString(new ValueIterator(actorMDPs[i], numMDPIterations, actorValues[i]).doValueIteration()));
+      System.out.println(Arrays.toString(new ValueIterator(actorMDPs[i], numMDPIterations, actorBrains[i]).doValueIteration()));
     }
   }
 
@@ -58,20 +67,16 @@ public abstract class World {
     return actorMDPs;
   }
 
-  public static ValueIterator.Storage[] getActorValues() {
-    return actorValues;
+  public static ValueIterator.Storage[] getActorBrains() {
+    return actorBrains;
   }
 
   public static void initialiseMDPs() {
     actorMDPs = new MDP[numActors];
-    actorValues = new ValueIterator.Storage[numActors];
+    actorBrains = new ValueIterator.Storage[numActors];
     for (int i = 0; i < numActors; i++) {
-      actorMDPs[i] = new OOMDP( gamma, new Action[] {
-        (a) -> {return a.toggleBool(0);},
-        (a) -> {return a.getState();},
-        (a) -> {return a.leave();}
-      }, i);
-      actorValues[i] = new ValueIterator.Storage();
+      actorMDPs[i] = new OOMDP( gamma, possibleActions, i);
+      actorBrains[i] = new ValueIterator.Storage();
     }
   }
 
@@ -89,6 +94,21 @@ public abstract class World {
 
   public static void setState(State state) {
     World.currentState = state;
+  }
+
+  public static void progressState(int actorNum) {
+    if (World.currentState.getActors().length <= actorNum) return;
+
+    World.stateHistory.push(World.currentState);
+    ValueIterator.Storage brain = World.actorBrains[actorNum];
+    
+    World.currentState = World.possibleActions[
+      brain.bestIndexAtState(State.encode(World.currentState))
+    ].act(World.currentState.getActors()[actorNum]);
+  }
+
+  public static void regressState() {
+    if (!World.stateHistory.empty()) World.currentState = World.stateHistory.pop();
   }
 
   public static void draw(Graphics2D g, int width, int height) {

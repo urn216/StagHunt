@@ -29,7 +29,7 @@ public class State {
     State result = new State(actors);
 
     for (int i = 0; i < actors.length; i++) {
-      actors[i] = new Actor(result, i, state >> (i * Actor.size()));
+      actors[i] = new Actor(result, i, state >> (i * Actor.size())); //TODO actors get their brains from World
     }
 
     return result;
