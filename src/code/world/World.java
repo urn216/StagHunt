@@ -94,6 +94,7 @@ public abstract class World {
 
   public static void setState(State state) {
     World.currentState = state;
+    World.stateHistory.clear();
   }
 
   public static void progressState(int actorNum) {

@@ -14,6 +14,8 @@ import code.math.Vector2;
  */
 public class State {
 
+  private static State[] stateTable = new State[numberOfStates()];
+
   /**
    * Decodes an {@code int} into its underlying {@code State}.
    * 
@@ -22,17 +24,20 @@ public class State {
    * @return a {@code State} represented by the given {@code int}
    */
   public static State decode(int state) {
-    if (state >= exitStateEncoded()) return new State();
+    if (stateTable.length != numberOfStates()) stateTable = new State[numberOfStates()]; //TODO check if any constants changed
+    state = Math.min(state, stateTable.length-1);
 
-    Actor[] actors = new Actor[World.getNumActors()];
-
-    State result = new State(actors);
-
-    for (int i = 0; i < actors.length; i++) {
-      actors[i] = new Actor(result, i, state >> (i * Actor.size())); //TODO actors get their brains from World
+    if (stateTable[state] == null) {
+      Actor[] actors = new Actor[state == stateTable.length - 1 ? 0 : World.getNumActors()];
+      
+      stateTable[state] = new State(actors);
+      
+      for (int i = 0; i < actors.length; i++) {
+        actors[i] = new Actor(stateTable[state], i, state >> (i * Actor.size()));
+      }
     }
 
-    return result;
+    return stateTable[state];
   }
 
   /**
@@ -131,13 +136,9 @@ public class State {
   }
 
   public State changeActor(int i, Actor newActor) {
-    State res = clone();
-    res.actors[i] = newActor;
-    return res;
-  }
-
-  public State clone() {
-    return State.decode(State.encode(this));
+    int encoded = (encode(this) & ~(((1 << Actor.size()) - 1) << (i * Actor.size()))) | (newActor.encode() << (i * Actor.size()));
+    // System.out.println("Actor " + i + ": " + encode(this) + " -> " + encoded);
+    return decode(encoded);
   }
 
   public void draw(Graphics2D g, int width, int height) {
