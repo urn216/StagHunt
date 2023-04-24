@@ -33,7 +33,7 @@ public class Actor {
     this.actorNum = actorNum;
     this.huntStag = huntStag;
 
-    float percentAround = 1f*actorNum/World.getNumActors();
+    float percentAround = 1f*actorNum/World.Setup.getNumActors();
 
     this.colourBody = Color.getHSBColor(percentAround, 1, 1   );
     this.colourText = Color.getHSBColor(percentAround, 1, 0.4f);
@@ -71,7 +71,7 @@ public class Actor {
   }
 
   public State leave() {
-    return State.decode(State.numberOfStates());
+    return State.Encoder.decode(State.Encoder.numberOfStates());
   }
 
   /**
@@ -84,9 +84,10 @@ public class Actor {
   public void draw(Graphics2D g, int x, int y, int size) {
     g.setStroke(new BasicStroke(Core.WINDOW.screenHeight()/128));
     g.setFont(new Font(Font.MONOSPACED, Font.BOLD, size/2));
+
     g.setColor(colourBody);
-    
     g.fillOval(x-size/2, y-size/2, size, size);
+
     g.setColor(colourText);
     g.drawOval(x-size/2, y-size/2, size, size);
 

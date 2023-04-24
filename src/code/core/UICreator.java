@@ -48,7 +48,7 @@ class UICreator {
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
-      new UIButton("Value Iterator" , () -> {UIController.setState(UIState.NEW_GAME); World.setState(State.decode(0));}),
+      new UIButton("Value Iterator" , () -> {UIController.setState(UIState.NEW_GAME); World.Player.setState(State.Encoder.decode(0));}),
       new UIButton("Quit to Desktop", Core::quitToDesk),
     },
     new boolean[]{false, false, true, false}
@@ -60,59 +60,34 @@ class UICreator {
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
-      new UIButton("Begin", () -> {World.initialiseMDPs(); World.doVI();}),
-      new UISlider.Double("Gamma: %.2f", World::getGamma, World::setGamma, 0, 1, 0.01),
-      new UISlider.Integer("Num Actors: %.0f", World::getNumActors, (a) -> {World.setNumActors(a); World.setState(State.decode(0));}, 1, 10),
-      new UIButton("Back", () -> {UIController.back(); World.setState(null);}),
+      new UIButton("Begin", () -> {World.Setup.initialiseMDPs(); World.Setup.doVI();}),
+      new UISlider.Double(
+        "Gamma: %.2f", 
+        World.Setup::getGamma, 
+        World.Setup::setGamma, 
+        0, 
+        1, 
+        0.01
+      ),
+      new UISlider.Integer(
+        "Num Actors: %.0f", 
+        World.Setup::getNumActors, 
+        (a) -> {World.Setup.setNumActors(a); World.Player.setState(State.Encoder.decode(0));}, 
+        1, 
+        10
+      ),
+      new UIButton("Back", UIController::back),
     },
     new boolean[]{false, false, true, false}
     );
     
     mainMenu.addState(UIState.DEFAULT,  title   );
     mainMenu.addState(UIState.DEFAULT,  outPanel);
-    mainMenu.addState(UIState.NEW_GAME, title    , UIState.DEFAULT);
+    mainMenu.addState(UIState.NEW_GAME, title    , UIState.DEFAULT, () -> {World.Player.setState(null); UIController.retState();});
     mainMenu.addState(UIState.NEW_GAME, newGame );
     
     mainMenu.clear();
     
     return mainMenu;
-  }
-  
-  /**
-  * Creates the HUD for use during gameplay.
-  */
-  public static UIPane createHUD() {
-    UIPane HUD = new UIPane();
-    
-    UIElement greyed = new UIElement(
-    new Vector2(0,0),
-    new Vector2(1, 1),
-    new boolean[]{false, false, false, false}
-    ){
-      protected void init() {this.backgroundColour = UIColours.SCREEN_TINT;}
-      protected void draw(Graphics2D g, int screenSizeY, Vector2 tL, Vector2 bR, Color[] c, UIInteractable highlighted) {}
-    };
-    
-    UIElement outPause = new ElemList(
-    new Vector2(0.38, 0.5-UIHelp.calculateListHeightDefault(2, BUFFER_HEIGHT, COMPON_HEIGHT)/2),
-    new Vector2(0.62, 0.5+UIHelp.calculateListHeightDefault(2, BUFFER_HEIGHT, COMPON_HEIGHT)/2),
-    COMPON_HEIGHT,
-    BUFFER_HEIGHT,
-    new UIInteractable[]{
-      new UIButton("Resume"         , UIController::back                         ),
-      // new UIButton("Quit to Title"  , Core::toMenu                               ),
-      new UIButton("Quit to Desktop", Core::quitToDesk                           ),
-    },
-    new boolean[]{false, true, true, true}
-    );
-    
-    HUD.setModeParent(UIState.DEFAULT, UIState.PAUSED);
-    
-    HUD.addState(UIState.PAUSED, greyed   , UIState.DEFAULT);
-    HUD.addState(UIState.PAUSED, outPause);
-    
-    HUD.clear();
-    
-    return HUD;
   }
 }

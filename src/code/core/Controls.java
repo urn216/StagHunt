@@ -1,7 +1,5 @@
 package code.core;
 
-import java.awt.MouseInfo;
-
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.KeyEvent;
@@ -9,6 +7,9 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JFrame;
 
+import code.world.World;
+
+import code.math.Vector2;
 import ui.math.Vector2I;
 import ui.control.UIController;
 
@@ -18,10 +19,8 @@ import ui.control.UIController;
 abstract class Controls {
   
   public static final boolean[] KEY_DOWN = new boolean[65536];
-  public static final boolean[] MOUSE_DOWN = new boolean[Math.max(MouseInfo.getNumberOfButtons(), 3)];
   
   public static Vector2I mousePos = new Vector2I();
-  public static Vector2I mousePre = new Vector2I();
   
   /**
   * Starts up all the listeners for the window. Only to be called once on startup.
@@ -45,17 +44,10 @@ abstract class Controls {
       public void mousePressed(MouseEvent e) {
         updateMousePos(e);
         
-        if (UIController.getHighlightedInteractable() == null) MOUSE_DOWN[e.getButton()] = true;
-        mousePre = mousePos;
-        
         //left click
         if (e.getButton() == 1) {
-          if (UIController.press()) return;
-        }
-        
-        //right click
-        if (e.getButton() == 3) {
-          return;
+          UIController.press();
+          World.Visualiser.press(mouseToWorldSpace());
         }
       }
       
@@ -63,23 +55,10 @@ abstract class Controls {
       public void mouseReleased(MouseEvent e) {
         updateMousePos(e);
         
-        MOUSE_DOWN[e.getButton()] = false;
-        
         //left click
         if (e.getButton() == 1) {
           UIController.release();
-          return;
         }
-        
-        //right click
-        if (e.getButton() == 3) {
-          return;
-        }
-      }
-      
-      @Override
-      public void mouseExited(MouseEvent e) {
-        mousePos = new Vector2I(Core.WINDOW.screenWidth()/2, Core.WINDOW.screenHeight()/2);
       }
     });
     
@@ -137,5 +116,12 @@ abstract class Controls {
     mousePos = new Vector2I(x, y);
     
     UIController.cursorMove(mousePos);
+  }
+
+  public static Vector2 mouseToWorldSpace() {
+    return new Vector2(
+      mousePos.x - (0.5 * Core.WINDOW.screenWidth ()), 
+      mousePos.y - (0.5 * Core.WINDOW.screenHeight())
+    ).scale        (1.0 / Core.WINDOW.screenHeight());
   }
 }

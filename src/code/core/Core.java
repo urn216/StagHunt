@@ -104,7 +104,6 @@ public abstract class Core {
     WINDOW.setFullscreen(false);
     
     UIController.putPane("Main Menu", UICreator.createMain());
-    UIController.putPane("HUD"      , UICreator.createHUD ());
     UIController.setCurrentPane("Main Menu");
     Controls.initialiseControls(WINDOW.FRAME);
   }
@@ -124,7 +123,7 @@ public abstract class Core {
 
   public static void printWorld(int size) {
     BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-    World.draw(img.createGraphics(), size, size);
+    World.Visualiser.draw(img.createGraphics(), size, size);
     IOHelp.writeImage("../output.png", img);
   }
   
@@ -139,10 +138,10 @@ public abstract class Core {
         System.exit(0);
       }
 
-      if (Controls.KEY_DOWN[0x30]) {World.progressState(0); Controls.KEY_DOWN[0x30] = false;}
-      if (Controls.KEY_DOWN[0x31]) {World.progressState(1); Controls.KEY_DOWN[0x31] = false;}
-      if (Controls.KEY_DOWN[0x32]) {World.progressState(2); Controls.KEY_DOWN[0x32] = false;}
-      if (Controls.KEY_DOWN['\b']) {World.regressState();   Controls.KEY_DOWN['\b'] = false;}
+      if (Controls.KEY_DOWN[0x30]) {World.Player.progressState(0); Controls.KEY_DOWN[0x30] = false;}
+      if (Controls.KEY_DOWN[0x31]) {World.Player.progressState(1); Controls.KEY_DOWN[0x31] = false;}
+      if (Controls.KEY_DOWN[0x32]) {World.Player.progressState(2); Controls.KEY_DOWN[0x32] = false;}
+      if (Controls.KEY_DOWN['\b']) {World.Player.regressState();   Controls.KEY_DOWN['\b'] = false;}
       
       WINDOW.PANEL.repaint();
       tickTime = System.currentTimeMillis() - tickTime;
@@ -166,7 +165,7 @@ public abstract class Core {
     
     g.fillRect(0, 0, sw, sh);
 
-    World.draw(g, sw, sh);
+    World.Visualiser.draw(g, sw, sh);
     
     UIController.draw(g, WINDOW.screenWidth(), WINDOW.screenHeight());
   }

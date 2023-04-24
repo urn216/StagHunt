@@ -1,6 +1,7 @@
 package code.world;
 
 import java.awt.Graphics2D;
+import java.util.stream.IntStream;
 
 import code.math.Vector2;
 
@@ -14,76 +15,78 @@ import code.math.Vector2;
  */
 public class State {
 
-  private static State[] stateTable = new State[numberOfStates()];
-
   /**
-   * Decodes an {@code int} into its underlying {@code State}.
-   * 
-   * @param state the {@code int} to decode.
-   * 
-   * @return a {@code State} represented by the given {@code int}
+   * A collection of static functions useful for encoding and decoding {@code State}s
+   * to and from binary for easy storage, transmission, and modification
    */
-  public static State decode(int state) {
-    if (stateTable.length != numberOfStates()) stateTable = new State[numberOfStates()]; //TODO check if any constants changed
-    state = Math.min(state, stateTable.length-1);
-
-    if (stateTable[state] == null) {
-      Actor[] actors = new Actor[state == stateTable.length - 1 ? 0 : World.getNumActors()];
-      
-      stateTable[state] = new State(actors);
-      
-      for (int i = 0; i < actors.length; i++) {
-        actors[i] = new Actor(stateTable[state], i, state >> (i * Actor.size()));
+  public static abstract class Encoder {
+    private static State[] stateTable = new State[numberOfStates()];
+  
+    /**
+     * Decodes an {@code int} into its underlying {@code State}.
+     * 
+     * @param state the {@code int} to decode.
+     * 
+     * @return a {@code State} represented by the given {@code int}
+     */
+    public static State decode(int state) {
+      if (stateTable.length != numberOfStates()) stateTable = new State[numberOfStates()]; //TODO check if any constants changed
+      state = Math.min(state, stateTable.length-1);
+  
+      if (stateTable[state] == null) {
+        Actor[] actors = new Actor[state == stateTable.length - 1 ? 0 : World.Setup.getNumActors()];
+        
+        stateTable[state] = new State(actors);
+        
+        for (int i = 0; i < actors.length; i++) {
+          actors[i] = new Actor(stateTable[state], i, state >> (i * Actor.size()));
+        }
       }
+  
+      return stateTable[state];
     }
-
-    return stateTable[state];
-  }
-
-  /**
-   * Encodes a {@code State} into a single {@code int} to be understood by a {@code ValueIterator}.
-   * 
-   * @param state the {@code State} to encode
-   * 
-   * @return a uniquely identifiable {@code int} representation of the given {@code State}
-   */
-  public static int encode(State state) {
-    if (state.actors.length == 0) return exitStateEncoded();
-
-    int res = 0;
-
-    for (int i = 0; i < World.getNumActors(); i++) {
-      res |= state.actors[i].encode() << (i * Actor.size());
+  
+    /**
+     * Encodes a {@code State} into a single {@code int} to be understood by a {@code ValueIterator}.
+     * 
+     * @param state the {@code State} to encode
+     * 
+     * @return a uniquely identifiable {@code int} representation of the given {@code State}
+     */
+    public static int encode(State state) {
+      if (state.actors.length == 0) return exitStateEncoded();
+  
+      int res = 0;
+  
+      for (int i = 0; i < state.actors.length; i++) {
+        res |= state.actors[i].encode() << (i * Actor.size());
+      }
+  
+      return res;
     }
-
-    return res;
+  
+    /**
+     * Gets the size in bits of a {@code State}.
+     * 
+     * @return the number of bits required to represent a {@code State}
+     */
+    public static int size() {
+      return World.Setup.getNumActors()*Actor.size() + 1;
+    }
+  
+    /**
+     * The total number of {@code State}s possible with the current global settings.
+     * 
+     * @return the total number of unique {@code State} objects.
+     */
+    public static int numberOfStates() {
+      return (1 << (World.Setup.getNumActors() * Actor.size())) + 1;
+    }
+  
+    public static int exitStateEncoded() {
+      return numberOfStates()-1;
+    }
   }
-
-  /**
-   * Gets the size in bits of a {@code State}.
-   * 
-   * @return the number of bits required to represent a {@code State}
-   */
-  public static int size() {
-    return World.getNumActors()*Actor.size() + 1;
-  }
-
-  /**
-   * The total number of {@code State}s possible with the current global settings.
-   * 
-   * @return the total number of unique {@code State} objects.
-   */
-  public static int numberOfStates() {
-    return (1 << (World.getNumActors() * Actor.size())) + 1;
-  }
-
-  public static int exitStateEncoded() {
-    return numberOfStates()-1;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////
-  //NON STATIC/////////////////////NON STATIC////////////////////////NON STATIC//
-  ///////////////////////////////////////////////////////////////////////////////
 
   private final Actor[] actors;
   private final Vector2[] actorPs;
@@ -95,9 +98,9 @@ public class State {
    * {@code numActors} or empty to represent the 'exit' {@code State}
    */
   private State(Actor... actors) {
-    if (actors.length != World.getNumActors() && actors.length != 0) {
+    if (actors.length != World.Setup.getNumActors() && actors.length != 0) {
       throw new RuntimeException(
-        "Invalid number of Actors! Expected " + World.getNumActors() + ", but recieved " + actors.length
+        "Invalid number of Actors! Expected " + World.Setup.getNumActors() + ", but recieved " + actors.length
       );
     }
 
@@ -122,6 +125,33 @@ public class State {
   }
 
   /**
+   * Retrieves the {@code Actor} at a given {@code Vector2} position.
+   * <p>
+   * Assumes given position is in a square between {@code -1} and {@code 1} in both dimensions
+   * 
+   * @param p a {@code Vector2} with {@code x} and {@code y} coordinates between {@code -1} and {@code 1}
+   * @return the {@code Actor} at the given location, or {@code null} if none was found
+   */
+  public Actor getActor(Vector2 p) {
+    int closest = getActorNum(p);
+    return closest == -1 ? null : actors[closest];
+  }
+
+  /**
+   * Retrieves the index of the {@code Actor} at a given {@code Vector2} position.
+   * <p>
+   * Assumes given position is in a square between {@code -1} and {@code 1} in both dimensions
+   * 
+   * @param p a {@code Vector2} with {@code x} and {@code y} coordinates between {@code -1} and {@code 1}
+   * @return the @{@code int} index of the {@code Actor} at the given location, or {@code -1} if none was found
+   */
+  public int getActorNum(Vector2 p) {
+    return IntStream.range(0, actors.length).filter((i) -> p.subtract(actorPs[i]).magsquare() < 0.00390625).reduce(
+      (a, b) -> actorPs[a].subtract(p).magsquare() < actorPs[a].subtract(p).magsquare() ? a : b
+    ).orElse(-1);
+  }
+
+  /**
    * Checks to see if all the {@code Actor}s in this {@code State} meet a certain condition.
    * 
    * @param ac the condition to check for on all {@code Actor}s
@@ -136,9 +166,9 @@ public class State {
   }
 
   public State changeActor(int i, Actor newActor) {
-    int encoded = (encode(this) & ~(((1 << Actor.size()) - 1) << (i * Actor.size()))) | (newActor.encode() << (i * Actor.size()));
+    int encoded = (State.Encoder.encode(this) & ~(((1 << Actor.size()) - 1) << (i * Actor.size()))) | (newActor.encode() << (i * Actor.size()));
     // System.out.println("Actor " + i + ": " + encode(this) + " -> " + encoded);
-    return decode(encoded);
+    return State.Encoder.decode(encoded);
   }
 
   public void draw(Graphics2D g, int width, int height) {

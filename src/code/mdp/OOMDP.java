@@ -10,13 +10,13 @@ public class OOMDP implements MDP {
   // private static final double COST_OF_FAILING = -10;
 
   public OOMDP(double gamma, Action[] actions, int actor) {
-    int sTot = State.numberOfStates();
+    int sTot = State.Encoder.numberOfStates();
     int aTot = actions.length;
     double[][][] T = new double[sTot][aTot][sTot];
     double[][][] R = new double[sTot][aTot][sTot];
 
     for (int s = 0; s < sTot; s++) {
-      State state = State.decode(s);
+      State state = State.Encoder.decode(s);
 
       // Find all the valid actions this actor can perform from this state
       for (int a = 0; a < actions.length; a++) {
@@ -30,12 +30,12 @@ public class OOMDP implements MDP {
         if (nextState == null) continue;
         //
 
-        int sPrime = State.encode(nextState);
+        int sPrime = State.Encoder.encode(nextState);
 
         // Probability of success constant for now
         T[s][a][sPrime] = 1;
         // If we exited, claim reward, otherwise keep chugging
-        R[s][a][sPrime] = sPrime == State.exitStateEncoded() ? 
+        R[s][a][sPrime] = sPrime == State.Encoder.exitStateEncoded() ? 
           state.getActors()[actor].exitReward() :
           COST_OF_LIVING;
       }
