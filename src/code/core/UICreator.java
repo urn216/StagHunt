@@ -22,7 +22,7 @@ import java.awt.Graphics2D;
 class UICreator {
   // private static final UIElement VIRTUAL_KEYBOARD = new ElemKeyboard();
   
-  private static final double COMPON_HEIGHT = 0.075;
+  private static final double COMPON_HEIGHT = 0.065;
   private static final double BUFFER_HEIGHT = 0.015;
   
   /**
@@ -44,7 +44,7 @@ class UICreator {
     
     UIElement outPanel = new ElemList(
     new Vector2(0   , 0.28),
-    new Vector2(0.24, 0.28+UIHelp.calculateListHeightDefault(2, BUFFER_HEIGHT, COMPON_HEIGHT)),
+    new Vector2(0.18, 0.28+UIHelp.calculateListHeightDefault(2, BUFFER_HEIGHT, COMPON_HEIGHT)),
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
@@ -56,7 +56,7 @@ class UICreator {
     
     UIElement newGame = new ElemList(
     new Vector2(0   , 0.28),
-    new Vector2(0.2 , 0.28+UIHelp.calculateListHeight(BUFFER_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT*2, COMPON_HEIGHT*2, COMPON_HEIGHT)),
+    new Vector2(0.18, 0.28+UIHelp.calculateListHeight(BUFFER_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT*2, COMPON_HEIGHT*2, COMPON_HEIGHT, COMPON_HEIGHT)),
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
@@ -76,6 +76,7 @@ class UICreator {
         1, 
         10
       ),
+      new UIToggle("Co-op VI", World.Setup::isCooperativeVI, World.Setup::setCooperativeVI),
       new UIButton("Back", UIController::back),
     },
     new boolean[]{false, false, true, false}

@@ -9,9 +9,9 @@ import java.util.Arrays;
 import ui.control.UIController;
 
 import code.math.IOHelp;
-import code.math.ValueIterator;
 import code.mdp.ClassicMDP;
 import code.mdp.MDP;
+import code.vi.ValueIterator;
 import code.world.World;
 
 public abstract class Core {

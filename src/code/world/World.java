@@ -5,10 +5,11 @@ import java.awt.Graphics2D;
 import java.util.Arrays;
 import java.util.Stack;
 
-import code.math.ValueIterator;
 import code.math.Vector2;
 import code.mdp.MDP;
 import code.mdp.OOMDP;
+import code.vi.CVIMaster;
+import code.vi.ValueIterator;
 
 public abstract class World {
 
@@ -26,6 +27,8 @@ public abstract class World {
   private static int numActors = 1;
   private static ValueIterator.Storage[] actorBrains = new ValueIterator.Storage[0];
   private static MDP[] actorMDPs = new MDP[0];
+
+  private static boolean cooperativeVI = false;
 
   private static int numMDPIterations = 3;
 
@@ -65,6 +68,14 @@ public abstract class World {
       World.numMDPIterations = numMDPIterations;
     }
 
+    public static boolean isCooperativeVI() {
+      return cooperativeVI;
+    }
+
+    public static void setCooperativeVI(boolean cooperativeVI) {
+      World.cooperativeVI = cooperativeVI;
+    }
+
     public static void initialiseMDPs() {
       actorMDPs = new MDP[numActors];
       actorBrains = new ValueIterator.Storage[numActors];
@@ -75,9 +86,10 @@ public abstract class World {
     }
   
     public static void doVI() {
-      for (int i = 0; i < actorMDPs.length; i++) {
+      if (!World.cooperativeVI) for (int i = 0; i < actorMDPs.length; i++) {
         System.out.println(Arrays.toString(new ValueIterator(actorMDPs[i], numMDPIterations, actorBrains[i]).doValueIteration()));
       }
+      else System.out.println(Arrays.deepToString(new CVIMaster(actorMDPs, numMDPIterations, actorBrains).doValueIteration()));
     }
 
   }
