@@ -17,11 +17,12 @@ import code.math.MathHelp;
  */
 public class Actor {
   private final boolean huntStag;
-  private final State state;
-  private final int actorNum;
+  protected final State state;
+  protected final int actorNum;
 
-  private final Color colourBody;
-  private final Color colourText;
+  protected final Color colourBody;
+  protected final Color colourText;
+  protected final String character;
 
   /**
    * Creates a new {@code Actor} with given parameters.
@@ -32,6 +33,7 @@ public class Actor {
     this.state = state;
     this.actorNum = actorNum;
     this.huntStag = huntStag;
+    this.character = huntStag ? "S" : "H";
 
     float percentAround = 1f*actorNum/World.Setup.getNumActors();
 
@@ -92,9 +94,8 @@ public class Actor {
     g.drawOval(x-size/2, y-size/2, size, size);
 
     FontMetrics met = g.getFontMetrics();
-    char c = huntStag ? 'S' : 'H';
 
-    g.drawString(c+"", x-met.charWidth(c)/2, y+met.getDescent()+met.getLeading());
+    g.drawString(character, x-met.stringWidth(character)/2, y+met.getDescent()+met.getLeading());
     g.setStroke(new BasicStroke(1));
   }
 }

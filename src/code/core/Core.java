@@ -10,14 +10,10 @@ import ui.control.UIController;
 
 import code.math.IOHelp;
 import code.mdp.ClassicMDP;
-import code.mdp.MDP;
 import code.vi.ValueIterator;
 import code.world.World;
 
 public abstract class Core {
-
-  private static final double COST_OF_LIVING  = -0.1;
-  private static final double COST_OF_FAILING = -10;
   
   public static final Window WINDOW = new Window();
   
@@ -25,80 +21,6 @@ public abstract class Core {
   private static final double MILLISECONDS_PER_TICK = 1000/TICKS_PER_SECOND;
   
   private static boolean quit = false;
-  
-  private static MDP mdp = new ClassicMDP(
-    0.9, 3, 3, 
-    new double[][][] { // Transition Matrix
-      { // hare hunting
-        { // toggle mode
-          0, 1, 0
-        },
-        { // pass
-          1, 0, 0
-        },
-        { // exit
-          0, 0, 1
-        }
-      },
-      { // stag hunting
-        { // toggle mode
-          1, 0, 0
-        },
-        { // pass
-          0, 1, 0
-        },
-        { // exit
-          0, 0, 1
-        }
-      },
-      { // exited
-        { // toggle mode
-          0, 0, 0
-        },
-        { // pass
-          0, 0, 0
-        },
-        { // exit
-          0, 0, 0
-        }
-      }
-    }, 
-    new double[][][] { // Reward Matrix
-      { // hare hunting
-        { // toggle mode
-          COST_OF_FAILING, COST_OF_LIVING, COST_OF_FAILING
-        },
-        { // pass
-          COST_OF_LIVING, COST_OF_FAILING, COST_OF_FAILING
-        },
-        { // exit
-          COST_OF_FAILING, COST_OF_FAILING, 3
-        }
-      },
-      { // stag hunting
-        { // toggle mode
-          COST_OF_LIVING, COST_OF_FAILING, COST_OF_FAILING
-        },
-        { // pass
-          COST_OF_FAILING, COST_OF_LIVING, COST_OF_FAILING
-        },
-        { // exit
-          COST_OF_FAILING, COST_OF_FAILING, 4
-        }
-      },
-      { // exited
-        { // toggle mode
-          0, 0, 0
-        },
-        { // pass
-          0, 0, 0
-        },
-        { // exit
-          0, 0, 0
-        }
-      }
-    }
-  );
   
   static {
     WINDOW.setFullscreen(false);
@@ -109,7 +31,7 @@ public abstract class Core {
   }
   
   public static void main(String[] args) {
-    ValueIterator vi = new ValueIterator(mdp, 3, null);
+    ValueIterator vi = new ValueIterator(ClassicMDP.oneManStagHunt, 3, null);
     System.out.println(Arrays.toString(vi.doValueIteration()));
     run();
   }
