@@ -1,9 +1,9 @@
 package code.vi;
 
 import java.util.Arrays;
-import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
+import code.math.MathHelp;
 import code.mdp.MDP;
 
 public record CVIMaster(MDP[] mdps, int numIterations, ValueIterator.Storage[] stores) {
@@ -27,15 +27,20 @@ public record CVIMaster(MDP[] mdps, int numIterations, ValueIterator.Storage[] s
    * @return the - hopefully - improved set of values for each state in the parent {@code MDP}s.
    */
   public double[][] doValueIterationStep(double[][] V) {
+    double[][][] Qs = new double[mdps.length][][];
+    for (int i = 0; i < mdps.length; i++) {
+      Qs[i] = calculateQs(V[i], mdps[i]);
+    }
+    
+    int[][] chosenActs = calculateBestActions(Qs);
     double[][] nextVs = new double[mdps.length][];
     for (int i = 0; i < mdps.length; i++) {
-      double[][] Q = calculateQs(V[i], mdps[i]);
-      nextVs[i] = calculateNextVs(Q, mdps[i]);
+      nextVs[i] = calculateNextVs(Qs[i], chosenActs);
       if (this.stores != null) {
-        this.stores[i].Q = Q;
+        this.stores[i].Q = Qs[i];
         this.stores[i].V = nextVs[i];
       }
-      else System.out.println(Arrays.deepToString(Q));
+      else System.out.println(Arrays.deepToString(Qs[i]));
     }
     return nextVs;
   }
@@ -57,34 +62,45 @@ public record CVIMaster(MDP[] mdps, int numIterations, ValueIterator.Storage[] s
     return V;
   }
 
+  private int[][] calculateBestActions(double[][][] Qs) {
+    int[][] res = new int[Qs[0].length][Qs.length];
+    for (int s = 0; s < Qs[0].length; s++) {
+      for (int i = 0; i < mdps.length; i++) {
+        res[s][i] = MathHelp.argMax(Qs[i][s]);
+      }
+    }
+    return res;
+  }
+
   /**
    * Finds the 'best' action to perform at each state and thus determines 
    * a single percieved value of each state in an {@code MDP}.
    * 
    * @param Q a table of percieved 'value' of performing each possible action at each possible state
+   * @param chosenActs the indices of the actions chosen as 'best' by each of the actors within the {@code World} for each state
    * 
    * @return an array of state 'values'
    */
-  private double[] calculateNextVs(double[][] Q, MDP mdp) {
-    double[] ans = new double[mdp.numStates()];
+  private double[] calculateNextVs(double[][] Q, int[][] chosenActs) {
+    double[] ans = new double[mdps[0].numStates()];
 
-    for (int s = 0; s < mdp.numStates(); s++) {
-      ans[s] = calculateNextV(Q[s], mdp);
+    for (int s = 0; s < mdps[0].numStates(); s++) {
+      ans[s] = calculateNextV(Q[s], chosenActs[s]);
     }
 
     return ans;
   }
 
   /**
-   * Finds the best possible action to perform at a given state, 
-   * and returns the percieved value of performing that action from that state.
+   * Finds the expected value at a given state to a VI
    * 
    * @param sQ the current percieved values of performing each action at a single state
+   * @param chosenActs the indices of the actions chosen as 'best' by each of the actors within the {@code World}
    * 
-   * @return the maximum value possible from an action at a given state.
+   * @return the average of all the chosen actions' value to a single VI
    */
-  private double calculateNextV(double[] sQ, MDP mdp) {
-    return DoubleStream.of(sQ).max().getAsDouble();
+  private double calculateNextV(double[] sQ, int[] chosenActs) {
+    return IntStream.of(chosenActs).mapToDouble((i) -> sQ[i]).sum()/chosenActs.length;
   }
 
   /**

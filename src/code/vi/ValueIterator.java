@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
+import code.math.MathHelp;
 import code.mdp.MDP;
 
 public record ValueIterator(MDP mdp, int numIterations, Storage store) {
@@ -138,7 +139,7 @@ public record ValueIterator(MDP mdp, int numIterations, Storage store) {
       for (int i = 0; i < Q[s].length; i++) {
         if (V[s] == Q[s][i]) return i;
       }
-      return -1;
+      return MathHelp.argMax(Q[s]);
     }
   }
 }

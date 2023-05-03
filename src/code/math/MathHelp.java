@@ -53,4 +53,16 @@ public abstract class MathHelp {
   public static int toggleBit(int num, int b) {
     return (num & (1 << b)) == 0 ? num | 1 << b : num & ~(1 << b);
   }
+
+  public static int argMax(double... vals) {
+    double max = Double.NEGATIVE_INFINITY;
+    int argMax = -1;
+    for (int i = 0; i < vals.length; i++) {
+      if (vals[i] > max) {
+        max = vals[i];
+        argMax = i;
+      }
+    }
+    return argMax;
+  }
 }
