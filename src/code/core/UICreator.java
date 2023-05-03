@@ -48,7 +48,7 @@ class UICreator {
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
-      new UIButton("Value Iterator" , () -> {UIController.setState(UIState.NEW_GAME); World.Player.setState(State.Encoder.decode(0));}),
+      new UIButton("Value Iterator" , () -> {UIController.setState(UIState.NEW_GAME); World.Player.setState(State.Encoder.decode(0b100001));}),
       new UIButton("Quit to Desktop", Core::quitToDesk),
     },
     new boolean[]{false, false, true, false}
@@ -72,7 +72,7 @@ class UICreator {
       new UISlider.Integer(
         "Num Actors: %.0f", 
         World.Setup::getNumActors, 
-        (a) -> {World.Setup.setNumActors(a); World.Player.setState(State.Encoder.decode(0));}, 
+        (a) -> {World.Setup.setNumActors(a); World.Player.setState(State.Encoder.decode(0b100001));}, 
         1, 
         10
       ),

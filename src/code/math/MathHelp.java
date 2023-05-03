@@ -49,4 +49,8 @@ public abstract class MathHelp {
    * @return {@code false} if input is {@code 0}; {@code true} if input is anything else
    */
   public static boolean intToBoolean(int i) {return i == 0 ? false : true;}
+
+  public static int toggleBit(int num, int b) {
+    return (num & (1 << b)) == 0 ? num | 1 << b : num & ~(1 << b);
+  }
 }

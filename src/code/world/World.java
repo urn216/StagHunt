@@ -18,19 +18,28 @@ public abstract class World {
   private static final Stack<State> stateHistory = new Stack<>();
   private static State currentState = null;
   
+  // private static Action[] possibleActions = {
+  //   (a) -> {return a.toggleBool(0);},
+  //   (a) -> {return a.getState();},
+  //   (a) -> {return a.leave();}
+  // };
+
   private static Action[] possibleActions = {
     (a) -> {return a.toggleBool(0);},
+    (a) -> {return a.toggleBool(1);},
+    (a) -> {return a.toggleBool(2);},
     (a) -> {return a.getState();},
     (a) -> {return a.leave();}
   };
 
-  private static int numActors = 1;
+  private static int numActors = 2;
+  private static int ActorSize = 3;
   private static ValueIterator.Storage[] actorBrains = new ValueIterator.Storage[0];
   private static MDP[] actorMDPs = new MDP[0];
 
   private static boolean cooperativeVI = false;
 
-  private static int numMDPIterations = 3;
+  private static int numMDPIterations = 100;
 
   public static abstract class Setup {
 
@@ -60,6 +69,10 @@ public abstract class World {
       World.numActors = numActors;
     }
 
+    public static int getActorSize() {
+      return ActorSize;
+    }
+
     public static int getNumMDPIterations() {
       return World.numMDPIterations;
     }
@@ -86,10 +99,17 @@ public abstract class World {
     }
   
     public static void doVI() {
+      System.out.println("\nValue Iteration:");
       if (!World.cooperativeVI) for (int i = 0; i < actorMDPs.length; i++) {
         System.out.println(Arrays.toString(new ValueIterator(actorMDPs[i], numMDPIterations, actorBrains[i]).doValueIteration()));
       }
-      else System.out.println(Arrays.deepToString(new CVIMaster(actorMDPs, numMDPIterations, actorBrains).doValueIteration()));
+      else {
+        double[][] Vs = new CVIMaster(actorMDPs, numMDPIterations, actorBrains).doValueIteration();
+        System.out.println("        A   , B   ");
+        for (int i = 0; i < Vs[0].length; i++) {
+          System.out.printf("%6s: %.2f, %.2f\n", Integer.toBinaryString(i), Vs[0][i], Vs[1][i]);
+        }
+      }
     }
 
   }

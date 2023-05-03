@@ -32,12 +32,18 @@ public class OOMDP implements MDP {
 
         int sPrime = State.Encoder.encode(nextState);
 
+        //exiting
+        if (sPrime == State.Encoder.exitStateEncoded()) {
+          //claim reward if possible
+          T[s][a][sPrime] = state.getActors()[actor].exitCondition() ? 1 : 0;
+          R[s][a][sPrime] = state.getActors()[actor].exitReward();
+          continue;
+        }
+
         // Probability of success constant for now
         T[s][a][sPrime] = 1;
         // If we exited, claim reward, otherwise keep chugging
-        R[s][a][sPrime] = sPrime == State.Encoder.exitStateEncoded() ? 
-          state.getActors()[actor].exitReward() :
-          COST_OF_LIVING;
+        R[s][a][sPrime] = COST_OF_LIVING;
       }
     }
 

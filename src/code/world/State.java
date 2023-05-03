@@ -4,6 +4,9 @@ import java.awt.Graphics2D;
 import java.util.stream.IntStream;
 
 import code.math.Vector2;
+import code.world.actors.Actor;
+// import code.world.actors.ActorSH;
+import code.world.actors.ActorSwap;
 
 /**
  * A single state of the world.
@@ -39,7 +42,7 @@ public class State {
         stateTable[state] = new State(actors);
         
         for (int i = 0; i < actors.length; i++) {
-          actors[i] = new Actor(stateTable[state], i, state >> (i * Actor.size()));
+          actors[i] = new ActorSwap(stateTable[state], i, state >> (i * World.Setup.getActorSize()));
         }
       }
   
@@ -59,7 +62,7 @@ public class State {
       int res = 0;
   
       for (int i = 0; i < state.actors.length; i++) {
-        res |= state.actors[i].encode() << (i * Actor.size());
+        res |= state.actors[i].encoded() << (i * World.Setup.getActorSize());
       }
   
       return res;
@@ -71,7 +74,7 @@ public class State {
      * @return the number of bits required to represent a {@code State}
      */
     public static int size() {
-      return World.Setup.getNumActors()*Actor.size() + 1;
+      return World.Setup.getNumActors()*World.Setup.getActorSize() + 1;
     }
   
     /**
@@ -80,7 +83,7 @@ public class State {
      * @return the total number of unique {@code State} objects.
      */
     public static int numberOfStates() {
-      return (1 << (World.Setup.getNumActors() * Actor.size())) + 1;
+      return (1 << (World.Setup.getNumActors() * World.Setup.getActorSize())) + 1;
     }
   
     public static int exitStateEncoded() {
@@ -165,8 +168,23 @@ public class State {
     return true;
   }
 
+  public boolean atMostOneActorCond(ActorCond ac) {
+    boolean found = false;
+    for (int i = 0; i < actors.length; i++) {
+      if (ac.find(actors[i])) {
+        if (found) {return false;}
+        found = true;
+      }
+    }
+    return true;
+  }
+
   public State changeActor(int i, Actor newActor) {
-    int encoded = (State.Encoder.encode(this) & ~(((1 << Actor.size()) - 1) << (i * Actor.size()))) | (newActor.encode() << (i * Actor.size()));
+    int encoded = (
+      State.Encoder.encode(this) & ~(((1 << World.Setup.getActorSize()) - 1) << (i * World.Setup.getActorSize()))
+    ) | (
+      newActor.encoded() << (i * World.Setup.getActorSize())
+    );
     // System.out.println("Actor " + i + ": " + encode(this) + " -> " + encoded);
     return State.Encoder.decode(encoded);
   }
