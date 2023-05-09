@@ -32,7 +32,7 @@ public record CVIMaster(MDP[] mdps, int numIterations, ValueIterator.Storage[] s
       Qs[i] = calculateQs(V[i], mdps[i]);
     }
     
-    int[][] chosenActs = calculateBestActions(Qs);
+    int[][] chosenActs = calculateBestActions(Qs); //TODO maybe store resulting states?
     double[][] nextVs = new double[mdps.length][];
     for (int i = 0; i < mdps.length; i++) {
       nextVs[i] = calculateNextVs(Qs[i], chosenActs);

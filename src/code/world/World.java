@@ -154,7 +154,7 @@ public abstract class World {
 
   public static abstract class Visualiser {
 
-    private static final Decal deer = new Decal("icon.png");
+    private static final Decal deer = new Decal("deer.png");
     private static final Color deerColour = new Color(27, 0, 15);
 
     public static void press(Vector2 p) {

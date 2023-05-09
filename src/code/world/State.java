@@ -4,9 +4,7 @@ import java.awt.Graphics2D;
 import java.util.stream.IntStream;
 
 import code.math.Vector2;
-import code.world.actors.Actor;
-// import code.world.actors.ActorSH;
-import code.world.actors.ActorSwap;
+import code.world.actors.*;
 
 /**
  * A single state of the world.

@@ -7,7 +7,7 @@ public class OOMDP implements MDP {
   private final MDP underlay;
 
   private static final double COST_OF_LIVING  = -0.1;
-  // private static final double COST_OF_FAILING = -10;
+  private static final double COST_OF_FAILING = Double.NEGATIVE_INFINITY;
 
   public OOMDP(double gamma, Action[] actions, int actor) {
     int sTot = State.Encoder.numberOfStates();
@@ -35,8 +35,10 @@ public class OOMDP implements MDP {
         //exiting
         if (sPrime == State.Encoder.exitStateEncoded()) {
           //claim reward if possible
-          T[s][a][sPrime] = state.getActors()[actor].exitCondition() ? 1 : 0;
-          R[s][a][sPrime] = state.getActors()[actor].exitReward();
+          T[s][a][sPrime] =  1;
+          R[s][a][sPrime] = state.getActors()[actor].exitCondition() ?
+          state.getActors()[actor].exitReward():
+          COST_OF_FAILING;
           continue;
         }
 

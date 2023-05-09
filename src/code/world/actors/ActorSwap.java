@@ -11,9 +11,9 @@ import code.world.State;
 
 public class ActorSwap extends Actor {
 
-  private static final int HOLD_LEFT_MASK = 1;
-  private static final int HOLD_OTHER_MASK = 2;
-  private static final int HOLD_RIGHT_MASK = 4;
+  private static final int HOLD_LEFT_MASK  = 0b001;
+  private static final int HOLD_OTHER_MASK = 0b010;
+  private static final int HOLD_RIGHT_MASK = 0b100;
 
   private static final double ownValue = 2;
   private static final double otherValue = 4;

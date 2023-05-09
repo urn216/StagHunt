@@ -72,7 +72,7 @@ class UICreator {
       new UISlider.Integer(
         "Num Actors: %.0f", 
         World.Setup::getNumActors, 
-        (a) -> {World.Setup.setNumActors(a); World.Player.setState(State.Encoder.decode(0b100001));}, 
+        (a) -> {World.Setup.setNumActors(a); World.Player.setState(State.Encoder.decode(0b0));}, 
         1, 
         10
       ),
