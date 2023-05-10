@@ -56,7 +56,7 @@ public abstract class Actor {
 
   protected abstract Actor replace(int encoded);
 
-  public final State toggleBool(int bool) {
+  public State toggleBool(int bool) {
     if (bool >= World.Setup.getActorSize()) throw new IndexOutOfBoundsException(bool);
     return state.changeActor(this.actorNum, replace(MathHelp.toggleBit(encoded, bool)));
   }

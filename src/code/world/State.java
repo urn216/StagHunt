@@ -177,6 +177,14 @@ public class State {
     return true;
   }
 
+  public boolean allButMeCond(ActorCond ac, int actorNum) {
+    for (int i = 0; i < actors.length; i++) {
+      if (i==actorNum) continue;
+      if (!ac.find(actors[i])) return false;
+    }
+    return true;
+  }
+
   public State changeActor(int i, Actor newActor) {
     int encoded = (
       State.Encoder.encode(this) & ~(((1 << World.Setup.getActorSize()) - 1) << (i * World.Setup.getActorSize()))

@@ -59,10 +59,10 @@ public abstract class Core {
       if (quit) {
         System.exit(0);
       }
-
-      if (Controls.KEY_DOWN[0x30]) {World.Player.progressState(0); Controls.KEY_DOWN[0x30] = false;}
-      if (Controls.KEY_DOWN[0x31]) {World.Player.progressState(1); Controls.KEY_DOWN[0x31] = false;}
-      if (Controls.KEY_DOWN[0x32]) {World.Player.progressState(2); Controls.KEY_DOWN[0x32] = false;}
+      for (int i = 0; i < 10; i++)
+        if (Controls.KEY_DOWN['0'+i]) {World.Player.progressState(i); Controls.KEY_DOWN['0'+i] = false;}
+      for (int i = 0; i < 5; i++)
+        if (Controls.KEY_DOWN['A'+i]) {World.Player.actInState(0, i); Controls.KEY_DOWN['A'+i] = false;}
       if (Controls.KEY_DOWN['\b']) {World.Player.regressState();   Controls.KEY_DOWN['\b'] = false;}
       
       WINDOW.PANEL.repaint();

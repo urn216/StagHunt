@@ -2,14 +2,15 @@ package code.world;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.Arrays;
 import java.util.Stack;
 
 import code.math.Vector2;
 import code.mdp.MDP;
 import code.mdp.OOMDP;
-import code.vi.CVIMaster;
+import code.vi.ComprehensiveVI;
+import code.vi.SymmetricVI;
 import code.vi.ValueIterator;
+import code.world.actors.Actor;
 
 public abstract class World {
 
@@ -17,19 +18,13 @@ public abstract class World {
 
   private static final Stack<State> stateHistory = new Stack<>();
   private static State currentState = null;
-  
-  // private static Action[] possibleActions = {
-  //   (a) -> {return a.toggleBool(0);},
-  //   (a) -> {return a.getState();},
-  //   (a) -> {return a.leave();}
-  // };
 
   private static Action[] possibleActions = {
-    (a) -> {return a.toggleBool(0);},
-    (a) -> {return a.toggleBool(1);},
-    (a) -> {return a.toggleBool(2);},
-    (a) -> {return a.getState();},
-    (a) -> {return a.leave();}
+    (a) -> a.toggleBool(0),
+    (a) -> a.toggleBool(1),
+    (a) -> a.toggleBool(2),
+    Actor::getState,
+    Actor::leave,
   };
 
   private static int numActors = 2;
@@ -37,7 +32,7 @@ public abstract class World {
   private static ValueIterator.Storage[] actorBrains = new ValueIterator.Storage[0];
   private static MDP[] actorMDPs = new MDP[0];
 
-  private static boolean cooperativeVI = false;
+  private static int VIMode = 2;
 
   private static int numMDPIterations = 100;
 
@@ -81,35 +76,46 @@ public abstract class World {
       World.numMDPIterations = numMDPIterations;
     }
 
-    public static boolean isCooperativeVI() {
-      return cooperativeVI;
+    public static int getVIMode() {
+      return World.VIMode;
     }
 
-    public static void setCooperativeVI(boolean cooperativeVI) {
-      World.cooperativeVI = cooperativeVI;
+    public static void setVIMode(int VIMode) {
+      World.VIMode = VIMode;
     }
 
     public static void initialiseMDPs() {
-      actorMDPs = new MDP[numActors];
+      actorMDPs = new MDP[numActors*(World.VIMode==2?2:1)];
+      
       actorBrains = new ValueIterator.Storage[numActors];
       for (int i = 0; i < numActors; i++) {
-        actorMDPs[i] = new OOMDP( gamma, possibleActions, i);
+        if (World.VIMode!=2) {
+          actorMDPs[i] = new OOMDP( gamma, possibleActions, i, i);
+        }
+        else {
+          actorMDPs[i*2] = new OOMDP( gamma, possibleActions, i, i);
+          actorMDPs[i*2+1] = new OOMDP( gamma, possibleActions, (i+1)%numActors, i);
+        }
         actorBrains[i] = new ValueIterator.Storage();
       }
     }
   
     public static void doVI() {
       System.out.println("\nValue Iteration:");
-      if (!World.cooperativeVI) for (int i = 0; i < actorMDPs.length; i++) {
-        System.out.println(Arrays.toString(new ValueIterator(actorMDPs[i], numMDPIterations, actorBrains[i]).doValueIteration()));
-      }
-      else {
-        double[][] Vs = new CVIMaster(actorMDPs, numMDPIterations, actorBrains).doValueIteration();
-        System.out.println("        A   , B   ");
-        for (int i = 0; i < Vs[0].length; i++) {
-          System.out.printf("%6s: %.2f, %.2f\n", Integer.toBinaryString(i), Vs[0][i], Vs[1][i]);
+      double[][] Vs = new double[numActors][];
+      switch(World.VIMode){
+        case 0:
+        for (int i = 0; i < actorMDPs.length; i++) {
+          Vs[i]=(new ValueIterator(actorMDPs[i], numMDPIterations, actorBrains[i]).doValueIteration());
         }
+        break;
+        case 1:
+        Vs = new ComprehensiveVI(actorMDPs, numMDPIterations, actorBrains).doValueIteration();
+        break;
+        case 2:
+        Vs = new SymmetricVI(new MDP[] {actorMDPs[0], actorMDPs[2]}, new MDP[] {actorMDPs[1], actorMDPs[3]}, numMDPIterations, actorBrains).doValueIteration();
       }
+      printVs(Vs);
     }
 
   }
@@ -132,17 +138,30 @@ public abstract class World {
       World.currentState = state;
       World.stateHistory.clear();
     }
-  
-    public static void progressState(int actorNum) {
+
+    private static ValueIterator.Storage getBrain(int actorNum) {
       if (World.currentState == null 
       ||  World.actorBrains.length != World.numActors
-      ||  World.currentState.getActors().length <= actorNum) return;
+      ||  World.currentState.getActors().length <= actorNum) return null;
   
       World.stateHistory.push(World.currentState);
-      ValueIterator.Storage brain = World.actorBrains[actorNum];
+      return World.actorBrains[actorNum];
+    }
+  
+    public static void progressState(int actorNum) {
+      ValueIterator.Storage brain = getBrain(actorNum);
+      if (brain == null) return;
       
       World.currentState = World.possibleActions[
         brain.bestIndexAtState(State.Encoder.encode(World.currentState))
+      ].act(World.currentState.getActors()[actorNum]);
+    }
+
+    public static void actInState(int actorNum, int action) {
+      if (getBrain(actorNum) == null) return;
+      
+      World.currentState = World.possibleActions[
+        action
       ].act(World.currentState.getActors()[actorNum]);
     }
   
@@ -178,5 +197,17 @@ public abstract class World {
       currentState.draw(g, width, height);
     }
 
+  }
+
+  public static void printVs(double[][] Vs) {
+    String buffer = "%"+(State.Encoder.size()-1)+"s";
+    System.out.printf(buffer, "");
+    for (int i = 0; i < Vs.length; i++) System.out.print("|  " + (char)(i+65) + "  ");
+    System.out.println();
+    for (int l = 0; l < Vs[0].length-1; l++) {
+      System.out.print(String.format(buffer, Integer.toBinaryString(l)).replace(' ', '0'));
+      for (int i = 0; i < Vs.length; i++) System.out.printf("|"+((Vs[i][l]<0)?"":" ")+"%.2f", Vs[i][l]);
+      System.out.println();
+    }
   }
 }

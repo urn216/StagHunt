@@ -59,6 +59,12 @@ public class ActorSwap extends Actor {
     return new ActorSH(this.state, this.actorNum, encoded);
   }
 
+  // @Override
+  // public State toggleBool(int bool) {
+  //   if (bool == 1 || this.state.allButMeCond((a) -> (a.encoded&(1<<bool))==0, this.actorNum)) return super.toggleBool(bool);
+  //   return null;
+  // }
+
   @Override
   public void draw(Graphics2D g, int x, int y, int size) {
     g.setStroke(new BasicStroke(Core.WINDOW.screenHeight()/64));
@@ -70,7 +76,7 @@ public class ActorSwap extends Actor {
 
     if (holdLeft) g.drawLine(x, y, leftX, objY);
     if (holdRight) g.drawLine(x, y, rightX, objY);
-    if (holdOther) g.drawLine(x, y, x, objY-Math.abs(y-objY));
+    if (holdOther) g.drawLine(x, y, x, objY-(y-objY));
 
     super.draw(g, x, y, size);
     super.draw(g, this.actorNum==0 ? leftX : rightX, objY, size/2);
