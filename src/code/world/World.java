@@ -27,14 +27,14 @@ public abstract class World {
   private static ValueIterator.Storage[] actorBrains = new ValueIterator.Storage[0];
   private static MDP[] actorMDPs = new MDP[0];
 
-  private static int VIMode = 0;
+  private static int VIMode = 2;
 
   private static int numMDPIterations = 100;
 
   public static abstract class Setup {
 
     static {
-      setActorType(ItemSwapper.class);
+      setActorType(StagHunter.class);
     }
 
     public static double getGamma() {

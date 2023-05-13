@@ -1,9 +1,11 @@
 package code.world.actors;
 
 import java.awt.Graphics2D;
+import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.FontMetrics;
 
+import code.core.Core;
 import code.math.MathHelp;
 import code.world.State;
 
@@ -51,6 +53,13 @@ public class StagHunter extends Actor {
 
   @Override
   public void draw(Graphics2D g, int x, int y, int size) {
+    g.setStroke(new BasicStroke(Core.WINDOW.screenHeight()/64));
+    g.setColor(colourText);
+    
+    int objY = Core.WINDOW.screenHeight()/2;
+    
+    if (holdOther) g.drawLine(x, y, x, objY-(y-objY));
+
     super.draw(g, x, y, size);
     
     g.setFont(new Font(Font.MONOSPACED, Font.BOLD, size/2));
