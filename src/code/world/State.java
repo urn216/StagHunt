@@ -1,10 +1,11 @@
 package code.world;
 
 import java.awt.Graphics2D;
+import java.lang.reflect.InvocationTargetException;
 import java.util.stream.IntStream;
 
 import code.math.Vector2;
-import code.world.actors.*;
+import code.world.actors.Actor;
 
 /**
  * A single state of the world.
@@ -40,7 +41,14 @@ public class State {
         stateTable[state] = new State(actors);
         
         for (int i = 0; i < actors.length; i++) {
-          actors[i] = new ActorSwap(stateTable[state], i, state >> (i * World.Setup.getActorSize()));
+          try {
+            actors[i] = World.Setup.getActorConstructor().newInstance(stateTable[state], i, state >> (i * World.Setup.getActorSize()));
+          } catch (InstantiationException
+              |    IllegalAccessException 
+              |    IllegalArgumentException
+              |    InvocationTargetException e) {
+            e.printStackTrace();
+          }
         }
       }
   

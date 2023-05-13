@@ -48,7 +48,7 @@ class UICreator {
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
-      new UIButton("Value Iterator" , () -> {UIController.setState(UIState.NEW_GAME); World.Player.setState(State.Encoder.decode(0b100001));}),
+      new UIButton("Value Iterator" , () -> {UIController.setState(UIState.NEW_GAME); World.Player.setState(State.Encoder.decode(0b0));}),
       new UIButton("Quit to Desktop", Core::quitToDesk),
     },
     new boolean[]{false, false, true, false}

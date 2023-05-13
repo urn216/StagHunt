@@ -9,7 +9,11 @@ import code.core.Core;
 import code.math.MathHelp;
 import code.world.State;
 
-public class ActorSwap extends Actor {
+public class ItemSwapper extends Actor {
+
+  private static final int SIZE = 3;
+
+  public static final int size() {return SIZE;}
 
   private static final int HOLD_LEFT_MASK  = 0b001;
   private static final int HOLD_OTHER_MASK = 0b010;
@@ -27,7 +31,7 @@ public class ActorSwap extends Actor {
   /**
    * Creates a new {@code Actor} with given parameters.
    */
-  public ActorSwap(State state, int actorNum, int encoded) {
+  public ItemSwapper(State state, int actorNum, int encoded) {
     super(state, actorNum, encoded);
     this.holdLeft = MathHelp.intToBoolean(encoded&HOLD_LEFT_MASK);
     this.holdOther = MathHelp.intToBoolean(encoded&HOLD_OTHER_MASK);
@@ -49,14 +53,14 @@ public class ActorSwap extends Actor {
 
   @Override
   public boolean exitCondition() {
-    return state.allActorsCond((a) -> !((ActorSwap)a).holdOther)
-    &&     state.atMostOneActorCond((a) -> ((ActorSwap)a).holdLeft)
-    &&     state.atMostOneActorCond((a) -> ((ActorSwap)a).holdRight);
+    return state.allActorsCond((a) -> !((ItemSwapper)a).holdOther)
+    &&     state.atMostOneActorCond((a) -> ((ItemSwapper)a).holdLeft)
+    &&     state.atMostOneActorCond((a) -> ((ItemSwapper)a).holdRight);
   }
 
   @Override
   protected Actor replace(int encoded) {
-    return new ActorSH(this.state, this.actorNum, encoded);
+    return new StagHunter(this.state, this.actorNum, encoded);
   }
 
   // @Override

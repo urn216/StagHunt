@@ -7,26 +7,34 @@ import java.awt.FontMetrics;
 import code.math.MathHelp;
 import code.world.State;
 
-public class ActorSH extends Actor {
+public class PrisonerDilemmee extends Actor {
 
-  private static final int HUNT_STAG_MASK = 1;
+  private static final int SIZE = 1;
+
+  public static final int size() {return SIZE;}
+
+  private static final int TAKE_CASH_MASK = 0b01;
+
+  private static final double cashValue = 100;
   
   protected final String character;
 
-  protected final boolean huntStag;
+  protected final boolean takeCash;
 
   /**
    * Creates a new {@code Actor} with given parameters.
    */
-  public ActorSH(State state, int actorNum, int encoded) {
+  public PrisonerDilemmee(State state, int actorNum, int encoded) {
     super(state, actorNum, encoded);
-    this.huntStag = MathHelp.intToBoolean(encoded&HUNT_STAG_MASK);
-    this.character = huntStag ? "S" : "H";
+    this.takeCash = MathHelp.intToBoolean(encoded&TAKE_CASH_MASK);
+    this.character = takeCash ? "T" : "L";
   }
 
   @Override
   public double exitReward() {
-    return huntStag ? state.allActorsCond((a) -> (a.encoded&HUNT_STAG_MASK)==1) ? 4 : 0 : 3;
+    return takeCash ? 
+      state.allActorsCond((a) -> ((PrisonerDilemmee)a).takeCash) ? 0 : cashValue: 
+      state.allActorsCond((a) -> !((PrisonerDilemmee)a).takeCash) ? cashValue/2 : 0;
   }
 
   @Override
@@ -36,7 +44,7 @@ public class ActorSH extends Actor {
 
   @Override
   protected Actor replace(int encoded) {
-    return new ActorSH(this.state, this.actorNum, encoded);
+    return new PrisonerDilemmee(this.state, this.actorNum, encoded);
   }
 
   @Override

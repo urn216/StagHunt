@@ -2,15 +2,15 @@ package code.world;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
 import code.math.Vector2;
 import code.mdp.MDP;
 import code.mdp.OOMDP;
-import code.vi.ComprehensiveVI;
-import code.vi.SymmetricVI;
-import code.vi.ValueIterator;
-import code.world.actors.Actor;
+import code.vi.*;
+import code.world.actors.*;
 
 public abstract class World {
 
@@ -19,24 +19,23 @@ public abstract class World {
   private static final Stack<State> stateHistory = new Stack<>();
   private static State currentState = null;
 
-  private static Action[] possibleActions = {
-    (a) -> a.toggleBool(0),
-    (a) -> a.toggleBool(1),
-    (a) -> a.toggleBool(2),
-    Actor::getState,
-    Actor::leave,
-  };
+  private static int actorSize;
+  private static Constructor<? extends Actor> actorConstructor;
+  private static Action[] possibleActions;
 
   private static int numActors = 2;
-  private static int ActorSize = 3;
   private static ValueIterator.Storage[] actorBrains = new ValueIterator.Storage[0];
   private static MDP[] actorMDPs = new MDP[0];
 
-  private static int VIMode = 2;
+  private static int VIMode = 0;
 
   private static int numMDPIterations = 100;
 
   public static abstract class Setup {
+
+    static {
+      setActorType(ItemSwapper.class);
+    }
 
     public static double getGamma() {
       return World.gamma;
@@ -65,7 +64,35 @@ public abstract class World {
     }
 
     public static int getActorSize() {
-      return ActorSize;
+      return actorSize;
+    }
+
+    public static void setActorType(Class<? extends Actor> c) {
+      try {
+        World.actorSize = (Integer)c.getDeclaredMethod("size").invoke(null);
+        World.actorConstructor = c.getConstructor(State.class, int.class, int.class);
+        setPossibleActions(World.actorSize);
+      } catch (IllegalAccessException 
+          |    IllegalArgumentException 
+          |    InvocationTargetException 
+          |    NoSuchMethodException
+          |    SecurityException e) {
+        e.printStackTrace();
+      }
+    }
+
+    public static void setPossibleActions(int numBools) {
+      World.possibleActions = new Action[numBools+2];
+      for (int i = 0; i < numBools; i++) {
+        int b = i;
+        World.possibleActions[i] = (a) -> a.toggleBool(b);
+      }
+      World.possibleActions[numBools  ] = Actor::getState;
+      World.possibleActions[numBools+1] = Actor::leave;
+    }
+
+    public static Constructor<? extends Actor> getActorConstructor() {
+      return World.actorConstructor;
     }
 
     public static int getNumMDPIterations() {
