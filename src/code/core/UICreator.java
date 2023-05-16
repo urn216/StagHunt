@@ -77,15 +77,31 @@ class UICreator {
         10
       ),
       // new UIToggle("Co-op VI", World.Setup::isCooperativeVI, World.Setup::setCooperativeVI),//dropdown menu: 'fast independant', 'comprehensive', 'symmetrical'
-      new UIButton("Back", UIController::back),
+      new UIButton("Return To Menu", UIController::back),
     },
     new boolean[]{false, false, true, false}
     );
+
+    UIElement randMove = new ElemList(
+      new Vector2(0.45, 1-UIHelp.calculateListHeight(BUFFER_HEIGHT, COMPON_HEIGHT)), 
+      new Vector2(0.55, 1),
+      COMPON_HEIGHT, 
+      BUFFER_HEIGHT, 
+      new UIComponent[] {
+        new UIButton(
+          "Random Turn", 
+          ()-> World.Player.progressState((int)(Math.random()*World.Setup.getNumActors()))
+        )
+      }, 
+      new boolean[] {false, true, false, false}
+    );
+    ((UIInteractable)randMove.getComponents()[0]).setLockCheck(() -> !World.Setup.isReady());
     
     mainMenu.addState(UIState.DEFAULT,  title   );
     mainMenu.addState(UIState.DEFAULT,  outPanel);
     mainMenu.addState(UIState.NEW_GAME, title    , UIState.DEFAULT, () -> {World.Player.setState(null); UIController.retState();});
     mainMenu.addState(UIState.NEW_GAME, newGame );
+    mainMenu.addState(UIState.NEW_GAME, randMove);
     
     mainMenu.clear();
     

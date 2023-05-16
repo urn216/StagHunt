@@ -27,14 +27,16 @@ public abstract class World {
   private static ValueIterator.Storage[] actorBrains = new ValueIterator.Storage[0];
   private static MDP[] actorMDPs = new MDP[0];
 
-  private static int VIMode = 2;
+  private static int VIMode = 0;
 
   private static int numMDPIterations = 100;
 
   public static abstract class Setup {
 
+    private static boolean ready = false;
+
     static {
-      setActorType(StagHunter.class);
+      setActorType(PrisonerDilemmee.class);
     }
 
     public static double getGamma() {
@@ -43,6 +45,7 @@ public abstract class World {
   
     public static void setGamma(double gamma) {
       World.gamma = gamma;
+      World.Setup.ready = false;
     }
   
     /**
@@ -61,6 +64,7 @@ public abstract class World {
      */
     public static void setNumActors(int numActors) {
       World.numActors = numActors;
+      World.Setup.ready = false;
     }
 
     public static int getActorSize() {
@@ -79,6 +83,7 @@ public abstract class World {
           |    SecurityException e) {
         e.printStackTrace();
       }
+      World.Setup.ready = false;
     }
 
     public static void setPossibleActions(int numBools) {
@@ -89,6 +94,7 @@ public abstract class World {
       }
       World.possibleActions[numBools  ] = Actor::getState;
       World.possibleActions[numBools+1] = Actor::leave;
+      World.Setup.ready = false;
     }
 
     public static Constructor<? extends Actor> getActorConstructor() {
@@ -101,6 +107,7 @@ public abstract class World {
   
     public static void setNumMDPIterations(int numMDPIterations) {
       World.numMDPIterations = numMDPIterations;
+      World.Setup.ready = false;
     }
 
     public static int getVIMode() {
@@ -109,10 +116,13 @@ public abstract class World {
 
     public static void setVIMode(int VIMode) {
       World.VIMode = VIMode;
+      World.Setup.ready = false;
     }
 
     public static void initialiseMDPs() {
       actorMDPs = new MDP[numActors*(World.VIMode==2?2:1)];
+
+      State.Encoder.resetStateTable();
       
       actorBrains = new ValueIterator.Storage[numActors];
       for (int i = 0; i < numActors; i++) {
@@ -125,6 +135,8 @@ public abstract class World {
         }
         actorBrains[i] = new ValueIterator.Storage();
       }
+      
+      World.Setup.ready = false;
     }
   
     public static void doVI() {
@@ -143,6 +155,12 @@ public abstract class World {
         Vs = new SymmetricVI(new MDP[] {actorMDPs[0], actorMDPs[2]}, new MDP[] {actorMDPs[1], actorMDPs[3]}, numMDPIterations, actorBrains).doValueIteration();
       }
       printVs(Vs);
+
+      World.Setup.ready = true;
+    }
+
+    public static boolean isReady() {
+      return World.Setup.ready;
     }
 
   }
@@ -218,7 +236,7 @@ public abstract class World {
         return;
       }
   
-      g.setColor(Color.white);
+      g.setColor(Setup.isReady() ? Color.white : Color.yellow);
       g.drawOval((width - height)/2, 0, height, height);
   
       currentState.draw(g, width, height);

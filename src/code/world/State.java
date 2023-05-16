@@ -23,6 +23,10 @@ public class State {
    */
   public static abstract class Encoder {
     private static State[] stateTable = new State[numberOfStates()];
+
+    public static void resetStateTable() {
+      stateTable = new State[numberOfStates()];
+    }
   
     /**
      * Decodes an {@code int} into its underlying {@code State}.
@@ -32,7 +36,7 @@ public class State {
      * @return a {@code State} represented by the given {@code int}
      */
     public static State decode(int state) {
-      if (stateTable.length != numberOfStates()) stateTable = new State[numberOfStates()]; //TODO check if any constants changed
+      if (stateTable.length!=numberOfStates()) stateTable = new State[numberOfStates()];
       state = Math.min(state, stateTable.length-1);
   
       if (stateTable[state] == null) {
