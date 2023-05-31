@@ -6,8 +6,9 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 
 import code.core.Core;
-import code.math.MathHelp;
 import code.world.State;
+
+import mki.math.MathHelp;
 
 public class ItemSwapper extends Actor {
 

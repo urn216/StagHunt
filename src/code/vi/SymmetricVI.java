@@ -3,7 +3,7 @@ package code.vi;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-import code.math.MathHelp;
+import mki.math.MathHelp;
 import code.mdp.MDP;
 
 public record SymmetricVI(MDP[] mdps, MDP[] mdpToOthers, int numIterations, ValueIterator.Storage[] stores) {

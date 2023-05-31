@@ -4,8 +4,9 @@ import java.awt.Graphics2D;
 import java.awt.Font;
 import java.awt.FontMetrics;
 
-import code.math.MathHelp;
 import code.world.State;
+
+import mki.math.MathHelp;
 
 public class PrisonerDilemmee extends Actor {
 

@@ -9,9 +9,9 @@ import javax.swing.JFrame;
 
 import code.world.World;
 
-import code.math.Vector2;
-import ui.math.Vector2I;
-import ui.control.UIController;
+import mki.math.vector.Vector2;
+import mki.math.vector.Vector2I;
+import mki.ui.control.UIController;
 
 /**
  * Handles all user input within the game

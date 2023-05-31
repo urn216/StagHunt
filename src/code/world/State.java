@@ -4,8 +4,9 @@ import java.awt.Graphics2D;
 import java.lang.reflect.InvocationTargetException;
 import java.util.stream.IntStream;
 
-import code.math.Vector2;
 import code.world.actors.Actor;
+
+import mki.math.vector.Vector2;
 
 /**
  * A single state of the world.

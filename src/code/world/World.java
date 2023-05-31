@@ -6,11 +6,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
-import code.math.Vector2;
 import code.mdp.MDP;
 import code.mdp.OOMDP;
 import code.vi.*;
 import code.world.actors.*;
+
+import mki.math.vector.Vector2;
 
 public abstract class World {
 

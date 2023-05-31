@@ -1,16 +1,17 @@
 package code.core;
 
-import ui.math.Vector2;
-import ui.control.UIColours;
-import ui.control.UIController;
-import ui.control.UIHelp;
-import ui.control.UIPane;
-import ui.control.UIState;
-import ui.components.UIComponent;
-import ui.components.UIInteractable;
-import ui.components.UIText;
-import ui.components.interactables.*;
-import ui.elements.*;
+import mki.math.vector.Vector2;
+
+import mki.ui.control.UIColours;
+import mki.ui.control.UIController;
+import mki.ui.control.UIHelp;
+import mki.ui.control.UIPane;
+import mki.ui.control.UIState;
+import mki.ui.components.UIComponent;
+import mki.ui.components.UIInteractable;
+import mki.ui.components.UIText;
+import mki.ui.components.interactables.*;
+import mki.ui.elements.*;
 
 import code.world.State;
 import code.world.World;

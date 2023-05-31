@@ -1,6 +1,6 @@
 package code.world;
 
-import code.math.IOHelp;
+import mki.io.FileIO;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -20,7 +20,7 @@ public class Decal
   * Constructor for {@code Decal}s, fixed images to be drawn to screen at a given location and size
   */
   public Decal(String file) {
-    this.img = IOHelp.readImage(file);
+    this.img = FileIO.readImage(file);
   }
 
   public void draw(Graphics2D g, int x, int y, int width, int height) {

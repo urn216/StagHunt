@@ -3,8 +3,9 @@ package code.core;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import code.math.IOHelp;
-import code.math.Vector2;
+import mki.io.FileIO;
+
+import mki.math.vector.Vector2;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -33,7 +34,7 @@ public final class Window {
     FRAME.getContentPane().add(PANEL);
     FRAME.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     FRAME.setResizable(true);
-    BufferedImage image = IOHelp.readImage("icon.png");
+    BufferedImage image = FileIO.readImage("icon.png");
     FRAME.setIconImage(image);
     
     GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();

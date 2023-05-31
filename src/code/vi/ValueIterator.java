@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
-import code.math.MathHelp;
+import mki.math.MathHelp;
 import code.mdp.MDP;
 
 public record ValueIterator(MDP mdp, int numIterations, Storage store) {

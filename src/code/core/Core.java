@@ -6,9 +6,9 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
-import ui.control.UIController;
+import mki.ui.control.UIController;
 
-import code.math.IOHelp;
+import mki.io.FileIO;
 import code.mdp.ClassicMDP;
 import code.vi.ValueIterator;
 import code.world.World;
@@ -46,7 +46,7 @@ public abstract class Core {
   public static void printWorld(int size) {
     BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
     World.Visualiser.draw(img.createGraphics(), size, size);
-    IOHelp.writeImage("../output.png", img);
+    FileIO.writeImage("../output.png", img);
   }
   
   /**

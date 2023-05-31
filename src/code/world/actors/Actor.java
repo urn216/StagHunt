@@ -5,9 +5,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import code.core.Core;
-import code.math.MathHelp;
 import code.world.State;
 import code.world.World;
+
+import mki.math.MathHelp;
 
 /**
  * A 'character' within the world. {@code Actor}s have attributes 
