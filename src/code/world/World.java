@@ -28,7 +28,7 @@ public abstract class World {
   private static ValueIterator.Storage[] actorBrains = new ValueIterator.Storage[0];
   private static MDP[] actorMDPs = new MDP[0];
 
-  private static int VIMode = 0;
+  private static int VIMode = 2;
 
   private static int numMDPIterations = 100;
 
@@ -37,7 +37,7 @@ public abstract class World {
     private static boolean ready = false;
 
     static {
-      setActorType(PrisonerDilemmee.class);
+      setActorType(ItemSwapper.class);
     }
 
     public static double getGamma() {

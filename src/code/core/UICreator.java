@@ -57,7 +57,7 @@ class UICreator {
     
     UIElement newGame = new ElemList(
     new Vector2(0   , 0.28),
-    new Vector2(0.11, 0.28+UIHelp.calculateListHeight(BUFFER_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT*2, COMPON_HEIGHT*2, COMPON_HEIGHT)),
+    new Vector2(0.11, 0.28+UIHelp.calculateListHeight(BUFFER_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT*2, COMPON_HEIGHT*2, COMPON_HEIGHT, COMPON_HEIGHT)),
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
@@ -77,7 +77,7 @@ class UICreator {
         1, 
         10
       ),
-      // new UIToggle("Co-op VI", World.Setup::isCooperativeVI, World.Setup::setCooperativeVI),//dropdown menu: 'fast independant', 'comprehensive', 'symmetrical'
+      new UIDropDown("VI Mode: %s", new UIDropDown.Option("Individual", () -> World.Setup.setVIMode(0))),//dropdown menu: 'fast independant', 'comprehensive', 'symmetrical'
       new UIButton("Return To Menu", UIController::back),
     },
     new boolean[]{false, false, true, false}
