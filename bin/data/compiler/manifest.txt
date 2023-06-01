@@ -1,2 +1,0 @@
-Main-Class: code/core/Core
-Class-Path: ../data/UI_1.0.4.jar
