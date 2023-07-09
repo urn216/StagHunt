@@ -135,7 +135,7 @@ public record ValueIterator(MDP mdp, int numIterations, Storage store) {
      * 
      * @return the index of the best action to perform from the given starting state.
      */
-    public int bestIndexAtState(int s) {
+    public int bestActionIndexAtState(int s) {
       return MathHelp.argMax(Q[s]);
     }
   }

@@ -46,8 +46,8 @@ abstract class Controls {
         
         //left click
         if (e.getButton() == 1) {
-          UIController.press();
-          World.Visualiser.press(mouseToWorldSpace());
+          if (!UIController.press())
+            World.Visualiser.press(mouseToWorldSpace());
         }
       }
       
@@ -58,6 +58,7 @@ abstract class Controls {
         //left click
         if (e.getButton() == 1) {
           UIController.release();
+          World.Visualiser.release(mouseToWorldSpace());
         }
       }
     });

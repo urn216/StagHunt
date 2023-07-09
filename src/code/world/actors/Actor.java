@@ -66,6 +66,10 @@ public abstract class Actor {
     return state;
   }
 
+  public Color getTextColour() {
+    return colourText;
+  }
+
   public State leave() {
     return State.Encoder.decode(State.Encoder.numberOfStates());
   }

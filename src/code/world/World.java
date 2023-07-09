@@ -6,12 +6,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
+import code.core.UICreator;
 import code.mdp.MDP;
 import code.mdp.OOMDP;
 import code.vi.*;
 import code.world.actors.*;
 
 import mki.math.vector.Vector2;
+import mki.ui.control.UIController;
 
 public abstract class World {
 
@@ -37,7 +39,7 @@ public abstract class World {
     private static boolean ready = false;
 
     static {
-      setActorType(ItemSwapper.class);
+      setActorType(StagHunter.class);
     }
 
     public static double getGamma() {
@@ -157,6 +159,8 @@ public abstract class World {
       }
       printVs(Vs);
 
+      World.Visualiser.reset();
+
       World.Setup.ready = true;
     }
 
@@ -183,6 +187,7 @@ public abstract class World {
     public static void setState(State state) {
       World.currentState = state;
       World.stateHistory.clear();
+      World.Visualiser.reset();
     }
 
     private static ValueIterator.Storage getBrain(int actorNum) {
@@ -199,7 +204,7 @@ public abstract class World {
       if (brain == null) return;
       
       World.currentState = World.possibleActions[
-        brain.bestIndexAtState(State.Encoder.encode(World.currentState))
+        brain.bestActionIndexAtState(State.Encoder.encode(World.currentState))
       ].act(World.currentState.getActors()[actorNum]);
     }
 
@@ -222,8 +227,44 @@ public abstract class World {
     private static final Decal deer = new Decal("deer.png");
     private static final Color deerColour = new Color(27, 0, 15);
 
-    public static void press(Vector2 p) {
+    private static boolean pressedIn = false;
+    private static int pressedActor = -1;
+    private static int selectedActor = -1;
 
+    public static void reset() {
+      UIController.clearTempElement();
+      Visualiser.pressedIn = false;
+      Visualiser.pressedActor = -1;
+      Visualiser.selectedActor = -1;
+    }
+
+    public static void press(Vector2 p) {
+      for (int i = 0; i < numActors; i++) {
+        double ang = i/(numActors/2.0);
+        if (p.subtract(0.4*Math.sin(Math.PI*ang), 0.4*Math.cos(Math.PI*ang)).magnitude() < 0.0625) pressedActor = i;
+      }
+      pressedIn = true;
+    }
+
+    public static void release(Vector2 p) {
+      if (!pressedIn) return;
+
+      double ang = pressedActor/(numActors/2.0);
+
+      if (
+        pressedActor < 0 || 
+        pressedActor == selectedActor || 
+        p.subtract(0.4*Math.sin(Math.PI*ang), 0.4*Math.cos(Math.PI*ang)).magnitude() >= 0.0625
+      ) {
+        reset();
+        return;
+      }
+
+      UIController.displayTempElement(UICreator.generateCirclePanel(pressedActor));
+      
+      selectedActor = pressedActor;
+      pressedIn = false;
+      pressedActor = -1;
     }
 
     public static void draw(Graphics2D g, int width, int height) {
