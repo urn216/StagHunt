@@ -104,6 +104,7 @@ public class State {
 
   private final Actor[] actors;
   private final Vector2[] actorPs;
+  private final Vector2[] actorObjPs;
 
   /**
    * Hidden constructor for {@code State} objects.
@@ -120,12 +121,15 @@ public class State {
 
     this.actors = actors;
     this.actorPs = new Vector2[actors.length];
+    this.actorObjPs = new Vector2[actors.length];
 
     double r = 0.4;
 
     for (int i = 0; i < actors.length; i++) {
       double ang = i/(actors.length/2.0);
       actorPs[i] = new Vector2(r*Math.sin(Math.PI*ang), r*Math.cos(Math.PI*ang));
+      ang -= 0.2;
+      actorObjPs[i] = new Vector2(r*0.75*Math.sin(Math.PI*ang), r*0.75*Math.cos(Math.PI*ang));
     }
   }
 
@@ -136,6 +140,24 @@ public class State {
    */
   public Actor[] getActors() {
     return actors;
+  }
+
+  /**
+   * Gets the positions of the centre of this {@code State}'s {@code Actor}s.
+   * 
+   * @return this {@code State}'s {@code Actor} positions in {@code Vector2} format
+   */
+  public Vector2[] getActorPs() {
+    return actorPs;
+  }
+
+  /**
+   * Gets the positions of the centre of any objects possessed by this {@code State}'s {@code Actor}s.
+   * 
+   * @return this {@code State}'s {@code Actor}-belongings positions in {@code Vector2} format
+   */
+  public Vector2[] getActorObjPs() {
+    return actorObjPs;
   }
 
   /**
@@ -210,7 +232,7 @@ public class State {
 
   public void draw(Graphics2D g, int width, int height) {
     for (int i = 0; i < actors.length; i++) {
-      actors[i].draw(g, (int)(actorPs[i].x*height+width/2), (int)(actorPs[i].y*height+height/2), height/8);
+      actors[i].draw(g, width, height);
     }
   }
 }

@@ -4,7 +4,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import code.core.Core;
 import code.world.State;
 import code.world.World;
 
@@ -71,11 +70,20 @@ public abstract class Actor {
   }
 
   public State leave() {
-    return State.Encoder.decode(State.Encoder.numberOfStates());
+    return exitCondition() ? State.Encoder.decode(State.Encoder.numberOfStates()) : this.state;
   }
 
-  public void draw(Graphics2D g, int x, int y, int size) {
-    g.setStroke(new BasicStroke(Core.WINDOW.screenHeight()/128));
+  public void draw(Graphics2D g, int width, int height) {
+
+    int x = (int)(this.state.getActorPs()[actorNum].x*height+width/2);
+    int y = (int)(this.state.getActorPs()[actorNum].y*height+height/2);
+    int size = height/8;
+
+    drawCircle(g, colourBody, colourText, x, y, size);
+  }
+
+  protected static void drawCircle(Graphics2D g, Color colourBody, Color colourText, int x, int y, int size) {
+    g.setStroke(new BasicStroke(size/16));
 
     g.setColor(colourBody);
     g.fillOval(x-size/2, y-size/2, size, size);

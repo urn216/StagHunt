@@ -5,9 +5,8 @@ import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.FontMetrics;
 
-import code.core.Core;
 import code.world.State;
-
+import code.world.World;
 import mki.math.MathHelp;
 
 public class StagHunter extends Actor {
@@ -53,15 +52,23 @@ public class StagHunter extends Actor {
   }
 
   @Override
-  public void draw(Graphics2D g, int x, int y, int size) {
-    g.setStroke(new BasicStroke(Core.WINDOW.screenHeight()/64));
+  public void draw(Graphics2D g, int width, int height) {
+
+    int x = (int)(this.state.getActorPs()[actorNum].x*height+width/2);
+    int y = (int)(this.state.getActorPs()[actorNum].y*height+height/2);
+    int size = height/8;
+
+    g.setStroke(new BasicStroke(height/64));
     g.setColor(colourText);
     
-    int objY = Core.WINDOW.screenHeight()/2;
-    
-    if (holdOther) g.drawLine(x, y, x, objY-(y-objY));
+    if (holdOther) g.drawLine(
+      x, 
+      y, 
+      (int)(this.state.getActorPs()[(actorNum+1)%World.Setup.getNumActors()].x*height+width/2), 
+      (int)(this.state.getActorPs()[(actorNum+1)%World.Setup.getNumActors()].y*height+height/2)
+    );
 
-    super.draw(g, x, y, size);
+    Actor.drawCircle(g, colourBody, colourText, x, y, size);
     
     g.setFont(new Font(Font.MONOSPACED, Font.BOLD, size/2));
     FontMetrics met = g.getFontMetrics();

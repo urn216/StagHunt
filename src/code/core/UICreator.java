@@ -15,6 +15,8 @@ import mki.ui.elements.*;
 import code.world.State;
 import code.world.World;
 import code.world.actors.Actor;
+import code.world.actors.ItemSwapper;
+import code.world.actors.StagHunter;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -60,7 +62,7 @@ public class UICreator {
     
     UIElement newGame = new ElemList(
     new Vector2(0   , 0.28),
-    new Vector2(0.11, 0.28+UIHelp.calculateListHeight(BUFFER_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT*2, COMPON_HEIGHT*2, COMPON_HEIGHT, COMPON_HEIGHT)),
+    new Vector2(0.11, 0.28+UIHelp.calculateListHeight(BUFFER_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT*2, COMPON_HEIGHT*2, COMPON_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT)),
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
@@ -81,6 +83,8 @@ public class UICreator {
         10
       ),
       new UIDropDown("VI Mode: %s", new UIDropDown.Option("Individual", () -> World.Setup.setVIMode(0))),//dropdown menu: 'fast independant', 'comprehensive', 'symmetrical'
+      new UIButton("Stag Hunt", ()->{World.Setup.setActorType(StagHunter.class);World.Player.setState(State.Encoder.decode(0b0));}),
+      new UIButton("Item Swap", ()->{World.Setup.setActorType(ItemSwapper.class);World.Player.setState(State.Encoder.decode(0b0));}),
       new UIButton("Return To Menu", UIController::back),
     },
     UIElement.TRANSITION_SLIDE_LEFT
@@ -129,6 +133,7 @@ public class UICreator {
             g.setColor(a.getTextColour());
             g.setStroke(new BasicStroke(Core.WINDOW.screenHeight()/128));
             g.draw(circ);
+            g.setStroke(new BasicStroke(1));
           }
         };
 
@@ -138,7 +143,7 @@ public class UICreator {
 
         for (int i = 0; i < World.Setup.getActorSize(); i++) {
           int action = i;
-          components[i+1] = new UIToggle("Test", ()->true, (b)->World.Player.actInState(actorNum, action));
+          components[i+1] = new UIButton("Action " + (action+1), ()->World.Player.actInState(actorNum, action));
         }
 
         components[components.length-3] = new UIButton("Pass", ()->World.Player.actInState(actorNum, components.length-4));
@@ -148,11 +153,29 @@ public class UICreator {
 
       @Override
       protected void draw(Graphics2D g, int screenSizeY, Vector2 tL, Vector2 bR, Color[] c, UIInteractable highlighted) {
-        float buttonWidth = (float)((bR.x-tL.x)/3);
-        float buttonHeight = (float)((bR.y-tL.y)/((components.length/2)+1));
+        tL = tL.add     (BUFFER_HEIGHT*screenSizeY);
+        bR = bR.subtract(BUFFER_HEIGHT*screenSizeY);
 
-        components[0].draw(g, (float)(tL.x)+buttonWidth, (float)tL.y, buttonWidth, buttonHeight/2, c[UIColours.TEXT]);
-        components[1].draw(g, (float)(tL.x), (float)tL.y+buttonHeight, buttonWidth, buttonHeight, components[1] == highlighted ? c[UIColours.BUTTON_HIGHLIGHTED_ACC] : c[UIColours.BUTTON_OUT_ACC], c[UIColours.BUTTON_BODY], c[UIColours.BUTTON_OUT_ACC], c[UIColours.BUTTON_IN_ACC], c[UIColours.BUTTON_LOCKED_BODY]);
+        float buttonWidth = (float)((bR.x-tL.x)/3);
+        float buttonHeight = buttonWidth/3.5f;
+
+        double mid = (tL.y+bR.y)/2;
+        double rad = (bR.y-tL.y)/2;
+
+        double yInit = rad-Math.sqrt(rad*rad-(buttonWidth*buttonWidth)/4);
+
+        components[0].draw(g, (float)(tL.x)+buttonWidth, (float)(tL.y+yInit), buttonWidth, buttonHeight/2, c[UIColours.TEXT]);
+
+        float yOff = ((float)(bR.y-tL.y-2*yInit)-buttonHeight)/((components.length+1)/2);
+
+        for (int i = 1; i < components.length-1; i++) {
+          float y = (float)(tL.y+yInit)+yOff*((i+1)/2);
+          double xInit = rad-Math.sqrt(rad*rad-Math.pow(mid-y - (mid-y > 0 ? 0 : buttonHeight), 2));
+          float x = (float)(i%2==1 ? tL.x+xInit : bR.x-buttonWidth-xInit);
+          components[i].draw(g, x, y, buttonWidth, buttonHeight, components[i] == highlighted ? c[UIColours.BUTTON_HIGHLIGHTED_ACC] : c[UIColours.BUTTON_OUT_ACC], c[UIColours.BUTTON_BODY], c[UIColours.BUTTON_OUT_ACC], c[UIColours.BUTTON_IN_ACC], c[UIColours.BUTTON_LOCKED_BODY]);
+        }
+
+        components[components.length-1].draw(g, (float)(tL.x)+buttonWidth, (float)(bR.y-yInit)-buttonHeight, buttonWidth, buttonHeight, components[components.length-1] == highlighted ? c[UIColours.BUTTON_HIGHLIGHTED_ACC] : c[UIColours.BUTTON_OUT_ACC], c[UIColours.BUTTON_BODY], c[UIColours.BUTTON_OUT_ACC], c[UIColours.BUTTON_IN_ACC], c[UIColours.BUTTON_LOCKED_BODY]);
       }
       
     };

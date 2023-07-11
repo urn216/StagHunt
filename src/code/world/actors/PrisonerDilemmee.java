@@ -49,8 +49,13 @@ public class PrisonerDilemmee extends Actor {
   }
 
   @Override
-  public void draw(Graphics2D g, int x, int y, int size) {
-    super.draw(g, x, y, size);
+  public void draw(Graphics2D g, int width, int height) {
+
+    int x = (int)(this.state.getActorPs()[actorNum].x*height+width/2);
+    int y = (int)(this.state.getActorPs()[actorNum].y*height+height/2);
+    int size = height/8;
+
+    Actor.drawCircle(g, colourBody, colourText, x, y, size);
     
     g.setFont(new Font(Font.MONOSPACED, Font.BOLD, size/2));
     FontMetrics met = g.getFontMetrics();

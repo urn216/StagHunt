@@ -39,7 +39,7 @@ public abstract class World {
     private static boolean ready = false;
 
     static {
-      setActorType(StagHunter.class);
+      setActorType(ItemSwapper.class);
     }
 
     public static double getGamma() {

@@ -7,7 +7,7 @@ import java.awt.FontMetrics;
 
 import code.core.Core;
 import code.world.State;
-
+import code.world.World;
 import mki.math.MathHelp;
 
 public class ItemSwapper extends Actor {
@@ -71,20 +71,34 @@ public class ItemSwapper extends Actor {
   // }
 
   @Override
-  public void draw(Graphics2D g, int x, int y, int size) {
+  public void draw(Graphics2D g, int width, int height) {
+
+    int x = (int)(this.state.getActorPs()[actorNum].x*height+width/2);
+    int y = (int)(this.state.getActorPs()[actorNum].y*height+height/2);
+    int size = height/8;
+
+    int objX = (int)(this.state.getActorObjPs()[actorNum].x*height+width/2);
+    int objY = (int)(this.state.getActorObjPs()[actorNum].y*height+height/2);
+
     g.setStroke(new BasicStroke(Core.WINDOW.screenHeight()/64));
     g.setColor(colourText);
 
-    int leftX = Core.WINDOW.screenWidth()/2-(Core.WINDOW.screenHeight()/4);
-    int rightX = Core.WINDOW.screenWidth()/2+(Core.WINDOW.screenHeight()/4);
-    int objY = Core.WINDOW.screenHeight()/2;
+    if (actorNum == 0 ? holdLeft : holdRight) g.drawLine(x, y, objX, objY);
+    if (actorNum != 0 ? holdLeft : holdRight) g.drawLine(
+      x, 
+      y, 
+      (int)(this.state.getActorObjPs()[(actorNum-1+World.Setup.getNumActors())%World.Setup.getNumActors()].x*height+width/2), 
+      (int)(this.state.getActorObjPs()[(actorNum-1+World.Setup.getNumActors())%World.Setup.getNumActors()].y*height+height/2)
+    );
+    if (holdOther) g.drawLine(
+      x, 
+      y, 
+      (int)(this.state.getActorPs()[(actorNum+1)%World.Setup.getNumActors()].x*height+width/2), 
+      (int)(this.state.getActorPs()[(actorNum+1)%World.Setup.getNumActors()].y*height+height/2)
+    );
 
-    if (holdLeft) g.drawLine(x, y, leftX, objY);
-    if (holdRight) g.drawLine(x, y, rightX, objY);
-    if (holdOther) g.drawLine(x, y, x, objY-(y-objY));
-
-    super.draw(g, x, y, size);
-    super.draw(g, this.actorNum==0 ? leftX : rightX, objY, size/2);
+    Actor.drawCircle(g, colourBody, colourText, x, y, size);
+    Actor.drawCircle(g, colourBody, colourText, objX, objY, size/2);
 
     g.setFont(new Font(Font.MONOSPACED, Font.BOLD, size/2));
     FontMetrics met = g.getFontMetrics();
