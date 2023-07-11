@@ -5,7 +5,6 @@ import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.FontMetrics;
 
-import code.core.Core;
 import code.world.State;
 import code.world.World;
 import mki.math.MathHelp;
@@ -80,7 +79,7 @@ public class ItemSwapper extends Actor {
     int objX = (int)(this.state.getActorObjPs()[actorNum].x*height+width/2);
     int objY = (int)(this.state.getActorObjPs()[actorNum].y*height+height/2);
 
-    g.setStroke(new BasicStroke(Core.WINDOW.screenHeight()/64));
+    g.setStroke(new BasicStroke(height/64));
     g.setColor(colourText);
 
     if (actorNum == 0 ? holdLeft : holdRight) g.drawLine(x, y, objX, objY);
