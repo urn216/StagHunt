@@ -230,9 +230,19 @@ public class State {
     return State.Encoder.decode(encoded);
   }
 
-  public void draw(Graphics2D g, int width, int height) {
+  public String toString() {
+    return ""+Encoder.encode(this);
+  }
+
+  public boolean equals(Object o) {
+    if (!(o instanceof State s)) return false;
+
+    return Encoder.encode(this) == Encoder.encode(s);
+  }
+
+  public void draw(Graphics2D g, int x, int y, int width, int height) {
     for (int i = 0; i < actors.length; i++) {
-      actors[i].draw(g, width, height);
+      actors[i].draw(g, x, y, width, height);
     }
   }
 }

@@ -73,10 +73,10 @@ public abstract class Actor {
     return exitCondition() ? State.Encoder.decode(State.Encoder.numberOfStates()) : this.state;
   }
 
-  public void draw(Graphics2D g, int width, int height) {
+  public void draw(Graphics2D g, int x, int y, int width, int height) {
 
-    int x = (int)(this.state.getActorPs()[actorNum].x*height+width/2);
-    int y = (int)(this.state.getActorPs()[actorNum].y*height+height/2);
+    x += (int)(this.state.getActorPs()[actorNum].x*width+width/2);
+    y += (int)(this.state.getActorPs()[actorNum].y*height+height/2);
     int size = height/8;
 
     drawCircle(g, colourBody, colourText, x, y, size);

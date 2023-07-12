@@ -1,15 +1,19 @@
 package code.core;
 
 import mki.math.vector.Vector2;
+
+import mki.ui.control.UIActionGetter;
 import mki.ui.control.UIColours;
 import mki.ui.control.UIController;
 import mki.ui.control.UIHelp;
 import mki.ui.control.UIPane;
 import mki.ui.control.UIState;
+
 import mki.ui.components.UIComponent;
 import mki.ui.components.UIInteractable;
 import mki.ui.components.UIText;
 import mki.ui.components.interactables.*;
+
 import mki.ui.elements.*;
 
 import code.world.State;
@@ -66,7 +70,7 @@ public class UICreator {
     COMPON_HEIGHT,
     BUFFER_HEIGHT,
     new UIInteractable[]{
-      new UIButton("Begin", () -> {World.Setup.initialiseMDPs(); World.Setup.doVI();}),
+      new UIButton("Begin", () -> {World.Setup.initialiseMDPs(); World.Setup.doVI(); World.Visualiser.drawMoveTree();}),
       new UISlider.Double(
         "Gamma: %.2f", 
         World.Setup::getGamma, 
@@ -99,11 +103,10 @@ public class UICreator {
         new UIButton(
           "Random Turn", 
           ()-> World.Player.progressState((int)(Math.random()*World.Setup.getNumActors()))
-        )
+        ).setLockCheck(lockCheck)
       }, 
       UIElement.TRANSITION_SLIDE_DOWN
     );
-    ((UIInteractable)randMove.getComponents()[0]).setLockCheck(() -> !World.Setup.isReady());
     
     mainMenu.addState(UIState.DEFAULT,  title   );
     mainMenu.addState(UIState.DEFAULT,  outPanel);
@@ -116,6 +119,8 @@ public class UICreator {
     
     return mainMenu;
   }
+
+  private static final UIActionGetter<Boolean> lockCheck = () -> !World.Setup.isReady();
 
   public static UIElement generateCirclePanel(int actorNum) {
     Actor a = World.Player.getState().getActors()[actorNum];
@@ -146,9 +151,12 @@ public class UICreator {
           components[i+1] = new UIButton("Action " + (action+1), ()->World.Player.actInState(actorNum, action));
         }
 
-        components[components.length-3] = new UIButton("Pass", ()->World.Player.actInState(actorNum, components.length-4));
-        components[components.length-2] = new UIButton("Leave", ()->World.Player.actInState(actorNum, components.length-3));
-        components[components.length-1] = new UIButton("Best Move", ()->World.Player.progressState(actorNum));
+        components[components.length-3] = new UIButton("Pass", ()->World.Player.actInState(actorNum, components.length-4))
+          .setLockCheck(lockCheck);
+        components[components.length-2] = new UIButton("Leave", ()->World.Player.actInState(actorNum, components.length-3))
+          .setLockCheck(()->!World.Setup.isReady() || !World.Player.getState().getActors()[actorNum].exitCondition());
+        components[components.length-1] = new UIButton("Best Move", ()->World.Player.progressState(actorNum))
+          .setLockCheck(lockCheck);
       }
 
       @Override
@@ -166,7 +174,7 @@ public class UICreator {
 
         components[0].draw(g, (float)(tL.x)+buttonWidth, (float)(tL.y+yInit), buttonWidth, buttonHeight/2, c[UIColours.TEXT]);
 
-        float yOff = ((float)(bR.y-tL.y-2*yInit)-buttonHeight)/((components.length+1)/2);
+        float yOff = ((float)(rad-yInit)*2-buttonHeight)/((components.length+1)/2);
 
         for (int i = 1; i < components.length-1; i++) {
           float y = (float)(tL.y+yInit)+yOff*((i+1)/2);

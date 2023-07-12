@@ -52,28 +52,28 @@ public class StagHunter extends Actor {
   }
 
   @Override
-  public void draw(Graphics2D g, int width, int height) {
+  public void draw(Graphics2D g, int x, int y, int width, int height) {
 
-    int x = (int)(this.state.getActorPs()[actorNum].x*height+width/2);
-    int y = (int)(this.state.getActorPs()[actorNum].y*height+height/2);
+    int thisX = x + (int)(this.state.getActorPs()[actorNum].x*width+width/2);
+    int thisY = y + (int)(this.state.getActorPs()[actorNum].y*height+height/2);
     int size = height/8;
 
     g.setStroke(new BasicStroke(height/64));
     g.setColor(colourText);
     
     if (holdOther) g.drawLine(
-      x, 
-      y, 
-      (int)(this.state.getActorPs()[(actorNum+1)%World.Setup.getNumActors()].x*height+width/2), 
-      (int)(this.state.getActorPs()[(actorNum+1)%World.Setup.getNumActors()].y*height+height/2)
+      thisX, 
+      thisY, 
+      x + (int)(this.state.getActorPs()[(actorNum+1)%World.Setup.getNumActors()].x*width+width/2), 
+      y + (int)(this.state.getActorPs()[(actorNum+1)%World.Setup.getNumActors()].y*height+height/2)
     );
 
-    Actor.drawCircle(g, colourBody, colourText, x, y, size);
+    Actor.drawCircle(g, colourBody, colourText, thisX, thisY, size);
     
     g.setFont(new Font(Font.MONOSPACED, Font.BOLD, size/2));
     FontMetrics met = g.getFontMetrics();
 
-    g.drawString(character, x-met.stringWidth(character)/2, y+met.getDescent()+met.getLeading());
+    g.drawString(character, thisX-met.stringWidth(character)/2, thisY+met.getDescent()+met.getLeading());
   }
   
 }

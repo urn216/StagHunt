@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
+import code.core.MoveTree;
 import code.core.UICreator;
 import code.mdp.MDP;
 import code.mdp.OOMDP;
@@ -200,17 +201,13 @@ public abstract class World {
     }
   
     public static void progressState(int actorNum) {
-      ValueIterator.Storage brain = getBrain(actorNum);
-      if (brain == null) return;
+      State res = getBestNextStateFromActor(World.currentState, actorNum);
+      if (res == null) return;
       
-      World.currentState = World.possibleActions[
-        brain.bestActionIndexAtState(State.Encoder.encode(World.currentState))
-      ].act(World.currentState.getActors()[actorNum]);
+      World.currentState = res;
     }
 
     public static void actInState(int actorNum, int action) {
-      if (getBrain(actorNum) == null) return;
-      
       World.currentState = World.possibleActions[
         action
       ].act(World.currentState.getActors()[actorNum]);
@@ -218,6 +215,15 @@ public abstract class World {
   
     public static void regressState() {
       if (!World.stateHistory.empty()) World.currentState = World.stateHistory.pop();
+    }
+
+    public static State getBestNextStateFromActor(State state, int actorNum) {
+      ValueIterator.Storage brain = getBrain(actorNum);
+      if (brain == null) return null;
+      
+      return World.possibleActions[
+        brain.bestActionIndexAtState(State.Encoder.encode(state))
+      ].act(state.getActors()[actorNum]);
     }
 
   }
@@ -231,6 +237,10 @@ public abstract class World {
     private static int pressedActor = -1;
     private static int selectedActor = -1;
 
+    /**
+     * Resets the visualisation of the {@code World}.
+     * Clears any menus and deselects any {@code Actor}s.
+     */
     public static void reset() {
       UIController.clearTempElement();
       Visualiser.pressedIn = false;
@@ -246,6 +256,12 @@ public abstract class World {
       pressedIn = true;
     }
 
+    /**
+     * Releases the cursor-hold from the world.
+     * Selects an {@code Actor} if it was previously pressed in and wasn't already selected.
+     * 
+     * @param p a {@code Vector2} representing the location the cursor was released at
+     */
     public static void release(Vector2 p) {
       if (!pressedIn) return;
 
@@ -255,10 +271,7 @@ public abstract class World {
         pressedActor < 0 || 
         pressedActor == selectedActor || 
         p.subtract(0.4*Math.sin(Math.PI*ang), 0.4*Math.cos(Math.PI*ang)).magnitude() >= 0.0625
-      ) {
-        reset();
-        return;
-      }
+      ) {reset(); return;}
 
       UIController.displayTempElement(UICreator.generateCirclePanel(pressedActor));
       
@@ -267,8 +280,18 @@ public abstract class World {
       pressedActor = -1;
     }
 
+    public static void drawMoveTree() {
+      MoveTree.drawMoveTree();
+    }
+
+    /**
+     * Draws the {@code World} to a {@code Graphics2D} instance.
+     * 
+     * @param g the {@code Graphics2D} instance to draw to
+     * @param width the width of the graphic
+     * @param height the height of the graphic
+     */
     public static void draw(Graphics2D g, int width, int height) {
-  
       if (currentState == null) {
         g.setColor(deerColour);
   
@@ -279,9 +302,9 @@ public abstract class World {
       }
   
       g.setColor(Setup.isReady() ? Color.white : Color.yellow);
-      g.drawOval((width - height)/2, 0, height, height);
-  
-      currentState.draw(g, width, height);
+
+      g.drawOval(          (width - height)/2, 0, height, height);
+      currentState.draw(g, (width - height)/2, 0, height, height);
     }
 
   }
