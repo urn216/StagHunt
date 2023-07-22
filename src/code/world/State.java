@@ -240,6 +240,15 @@ public class State {
     return Encoder.encode(this) == Encoder.encode(s);
   }
 
+  /**
+   * Draws this {@code State} to a {@code Graphics2D} object at a given size and offset.
+   * 
+   * @param g the {@code Graphics2D} object to draw to
+   * @param x the left-most x-coordinate of this {@code State} within {@code g}
+   * @param y the top-most y-coordinate of this {@code State} within {@code g}
+   * @param width the width in pixels to draw this {@code State} at
+   * @param height the height in pixels to draw this {@code State} at
+   */
   public void draw(Graphics2D g, int x, int y, int width, int height) {
     for (int i = 0; i < actors.length; i++) {
       actors[i].draw(g, x, y, width, height);

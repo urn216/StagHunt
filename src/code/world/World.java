@@ -281,7 +281,7 @@ public abstract class World {
     }
 
     public static void drawMoveTree() {
-      MoveTree.drawMoveTree();
+      MoveTree.drawMoveTree(720);
     }
 
     /**

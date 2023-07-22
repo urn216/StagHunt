@@ -82,13 +82,13 @@ public abstract class Actor {
     drawCircle(g, colourBody, colourText, x, y, size);
   }
 
-  protected static void drawCircle(Graphics2D g, Color colourBody, Color colourText, int x, int y, int size) {
+  protected static void drawCircle(Graphics2D g, Color colourBody, Color colourOutL, int x, int y, int size) {
     g.setStroke(new BasicStroke(size/16));
 
     g.setColor(colourBody);
     g.fillOval(x-size/2, y-size/2, size, size);
 
-    g.setColor(colourText);
+    g.setColor(colourOutL);
     g.drawOval(x-size/2, y-size/2, size, size);
 
     g.setStroke(new BasicStroke(1));
