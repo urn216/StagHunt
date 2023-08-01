@@ -221,6 +221,14 @@ public class State {
     return true;
   }
 
+  public boolean leftOfMeCond(ActorCond ac, int actorNum) {
+    return ac.find(actors[(actorNum-1+actors.length)%actors.length]);
+  }
+
+  public boolean rightOfMeCond(ActorCond ac, int actorNum) {
+    return ac.find(actors[(actorNum+1)%actors.length]);
+  }
+
   public State changeActor(int i, Actor newActor) {
     int encoded = (
       State.Encoder.encode(this) & ~(((1 << World.Setup.getActorSize()) - 1) << (i * World.Setup.getActorSize()))

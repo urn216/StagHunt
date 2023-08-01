@@ -33,7 +33,7 @@ public class ItemSwapper extends Actor {
    */
   public ItemSwapper(State state, int actorNum, int encoded) {
     super(state, actorNum, encoded);
-    this.holdLeft = MathHelp.intToBoolean(encoded&HOLD_LEFT_MASK);
+    this.holdLeft  = MathHelp.intToBoolean(encoded&HOLD_LEFT_MASK );
     this.holdOther = MathHelp.intToBoolean(encoded&HOLD_OTHER_MASK);
     this.holdRight = MathHelp.intToBoolean(encoded&HOLD_RIGHT_MASK);
     this.character = "" + (char)(actorNum + 65);
@@ -43,10 +43,10 @@ public class ItemSwapper extends Actor {
   public double exitReward() {
     double reward = 0;
     if (holdRight) {
-      reward += actorNum == 1 ? ownValue : otherValue;
+      reward += state.rightOfMeCond((a) -> ((ItemSwapper)a).holdLeft, actorNum) ? 0 : otherValue;
     }
     if (holdLeft) {
-      reward += actorNum == 0 ? ownValue : otherValue;
+      reward += state.leftOfMeCond((a) -> ((ItemSwapper)a).holdRight, actorNum) ? 0 : ownValue;
     }
     return reward;
   }
@@ -54,8 +54,8 @@ public class ItemSwapper extends Actor {
   @Override
   public boolean exitCondition() {
     return state.allActorsCond((a) -> !((ItemSwapper)a).holdOther)
-    &&     state.atMostOneActorCond((a) -> ((ItemSwapper)a).holdLeft)
-    &&     state.atMostOneActorCond((a) -> ((ItemSwapper)a).holdRight);
+    &&    (state.leftOfMeCond ((a) -> !((ItemSwapper)a).holdRight, actorNum) || !holdLeft )
+    &&    (state.rightOfMeCond((a) -> !((ItemSwapper)a).holdLeft , actorNum) || !holdRight);
   }
 
   @Override
@@ -82,18 +82,18 @@ public class ItemSwapper extends Actor {
     g.setStroke(new BasicStroke(height/64));
     g.setColor(colourText);
 
-    if (actorNum == 0 ? holdLeft : holdRight) g.drawLine(thisX, thisY, objX, objY);
-    if (actorNum != 0 ? holdLeft : holdRight) g.drawLine(
+    if (holdLeft)  g.drawLine(thisX, thisY, objX, objY);
+    if (holdRight) g.drawLine(
       thisX, 
       thisY, 
-      x + (int)(this.state.getActorObjPs()[(actorNum-1+World.Setup.getNumActors())%World.Setup.getNumActors()].x*width+width/2), 
-      y + (int)(this.state.getActorObjPs()[(actorNum-1+World.Setup.getNumActors())%World.Setup.getNumActors()].y*height+height/2)
+      x + (int)(this.state.getActorObjPs()[(actorNum+1)%World.Setup.getNumActors()].x*width+width/2), 
+      y + (int)(this.state.getActorObjPs()[(actorNum+1)%World.Setup.getNumActors()].y*height+height/2)
     );
     if (holdOther) g.drawLine(
       thisX, 
       thisY, 
-      x + (int)(this.state.getActorPs()[(actorNum+1)%World.Setup.getNumActors()].x*width+width/2), 
-      y + (int)(this.state.getActorPs()[(actorNum+1)%World.Setup.getNumActors()].y*height+height/2)
+      x + (int)(this.state.getActorPs()[(actorNum-1+World.Setup.getNumActors())%World.Setup.getNumActors()].x*width+width/2), 
+      y + (int)(this.state.getActorPs()[(actorNum-1+World.Setup.getNumActors())%World.Setup.getNumActors()].y*height+height/2)
     );
 
     Actor.drawCircle(g, colourBody, colourText, thisX, thisY, size);

@@ -162,7 +162,7 @@ public abstract class World {
         Vs = new ComprehensiveVI(actorMDPs, numMDPIterations, actorBrains).doValueIteration();
         break;
         case VI_MODE_SYMM:
-        // Vs = new SymmetricVI(actorMDPs, numMDPIterations, actorBrains).doValueIteration();
+        Vs = new SymmetricVI(actorMDPs[0], numMDPIterations, actorBrains).doValueIteration();
       }
       printVs(Vs);
 

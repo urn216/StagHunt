@@ -5,8 +5,9 @@ import java.util.stream.IntStream;
 
 import mki.math.MathHelp;
 import code.mdp.MDP;
+import code.world.World;
 
-public record SymmetricVI(MDP[] mdps, MDP[] mdpToOthers, int numIterations, ValueIterator.Storage[] stores) {
+public record SymmetricVI(MDP[] mdps, int numIterations, ValueIterator.Storage[] stores) {
 
   /**
    * Runs the {@code ValueIterator} for its desired number of iterations under its {@code MDP}
@@ -27,22 +28,20 @@ public record SymmetricVI(MDP[] mdps, MDP[] mdpToOthers, int numIterations, Valu
    * @return the - hopefully - improved set of values for each state in the parent {@code MDP}.
    */
   public double[][] doValueIterationStep(double[][] V) {
-    double[][][] Qts = new double[mdps.length][][];
-    double[][][] Qos = new double[mdps.length][][];
-    for (int i = 0; i < mdps.length; i++) {
-      Qts[i] = calculateQs(V[i], mdps[i]);
-      Qos[i] = calculateQs(V[i], mdpToOthers[i]);
+    double[][][] Qs = new double[mdps.length][][];
+    for (int actorDoing = 0; actorDoing < mdps.length; actorDoing++) {
+      Qs[actorDoing] = calculateQs(V[0], mdps[actorDoing]);
     }
     
-    int[][] chosenActs = calculateBestActions(Qts);
+    int[][] chosenActs = calculateBestActions(Qs);
     double[][] nextVs  = new double[mdps.length][];
     for (int i = 0; i < mdps.length; i++) {
-      nextVs[i] = calculateNextVs(i, Qts[i], Qos[i], chosenActs);
+      // nextVs[i] = calculateNextVs(i, Qs[i], chosenActs);
       if (this.stores != null) {
-        this.stores[i].Q = Qts[i];
+        this.stores[i].Q = rotateQMat(Qs[0], i, mdps.length*World.Setup.getActorSize(), World.Setup.getActorSize());
         this.stores[i].V = nextVs[i];
       }
-      else System.out.println(Arrays.deepToString(Qts));
+      else System.out.println(Arrays.deepToString(Qs));
     }
     return nextVs;
   }
@@ -65,10 +64,10 @@ public record SymmetricVI(MDP[] mdps, MDP[] mdpToOthers, int numIterations, Valu
   }
 
   private int[][] calculateBestActions(double[][][] Qs) {
-    int[][] res = new int[Qs[0].length][Qs.length];
+    int[][] res = new int[Qs[0].length][mdps.length];
     for (int s = 0; s < Qs[0].length; s++) {
       for (int i = 0; i < mdps.length; i++) {
-        res[s][i] = MathHelp.argMax(Qs[i][s]);
+        res[s][i] = MathHelp.argMax(Qs[0][rotateState(s, i, mdps.length*World.Setup.getActorSize(), World.Setup.getActorSize())]);
       }
     }
     return res;
@@ -146,26 +145,18 @@ public record SymmetricVI(MDP[] mdps, MDP[] mdpToOthers, int numIterations, Valu
   ///////                    \\\\\\\
   /////                        \\\\\
 
-  
-  // private double[][] flipQ(double[][] Q) {
-  //   double[][] res = new double[Q.length][];
-  //   for (int s = 0; s < res.length; s++) {
-  //     res[s] = Q[flipS(s)];
-  //   }
-  //   return res;
-  // }
+  private static int rotateState(int state, int actor, int stateSize, int actorSize) {
+    for (int i = 0; i < actor; i++) {
+      state = (state >> actorSize) | ((state & ((1<<actorSize)-1)) << (stateSize-actorSize));
+    }
+    return state;
+  }
 
-  // private double[] flipV(double[] V) {
-  //   double[] res = new double[V.length];
-  //   for (int s = 0; s < res.length; s++) {
-  //     res[s] = V[flipS(s)];
-  //   }
-  //   return res;
-  // }
-
-  // private int flipS(int s) {
-  //   int left = (s>>3)&7;
-  //   int right = s&7;
-  //   return (right<<3) | left;
-  // }
+  private static double[][] rotateQMat(double[][] Q, int actor, int stateSize, int actorSize) {
+    double[][] res = new double[Q.length][];
+    for (int s = 0; s < Q.length; s++) {
+      res[s] = Q[rotateState(s, actor, stateSize, actorSize)];
+    }
+    return res;
+  }
 }
