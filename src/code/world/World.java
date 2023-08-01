@@ -35,7 +35,7 @@ public abstract class World {
   private static ValueIterator.Storage[] actorBrains = new ValueIterator.Storage[0];
   private static MDP[][] actorMDPs = new MDP[0][0];
   
-    private static int VIMode = VI_MODE_COMP;
+    private static int VIMode = VI_MODE_SYMM;
 
   private static int numMDPIterations = 100;
 
@@ -136,9 +136,9 @@ public abstract class World {
       State.Encoder.resetStateTable();
       
       actorBrains = new ValueIterator.Storage[numActors];
+      for (int i = 0; i < actorBrains.length; i++) actorBrains[i] = new ValueIterator.Storage();
+      
       for (int i = 0; i < actorMDPs.length; i++) {
-        actorBrains[i] = new ValueIterator.Storage();
-
         if (VIMode == VI_MODE_DUMB)
           actorMDPs[i][0] = new OOMDP(gamma, possibleActions, i, i);
         else for (int j = 0; j < actorMDPs[i].length; j++) {

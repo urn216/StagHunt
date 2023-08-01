@@ -1,6 +1,7 @@
 package code.vi;
 
 import java.util.Arrays;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 import mki.math.MathHelp;
@@ -16,7 +17,12 @@ public record SymmetricVI(MDP[] mdps, int numIterations, ValueIterator.Storage[]
    * @return a set of percieved 'values' for each possible state within an {@code MDP}
    */
   public double[][] doValueIteration() {
-    return doXValueIterationSteps(new double[mdps.length][mdps[0].numStates()], numIterations);
+    double[] V = doXValueIterationSteps(new double[mdps[0].numStates()], numIterations);
+    double[][] Vs = new double[mdps.length][];
+    for (int i = 0; i < Vs.length; i++) {
+      Vs[i] = rotateVTab(V, i, mdps.length*World.Setup.getActorSize(), World.Setup.getActorSize());
+    }
+    return Vs;
   }
 
   /**
@@ -27,23 +33,22 @@ public record SymmetricVI(MDP[] mdps, int numIterations, ValueIterator.Storage[]
    * 
    * @return the - hopefully - improved set of values for each state in the parent {@code MDP}.
    */
-  public double[][] doValueIterationStep(double[][] V) {
+  public double[] doValueIterationStep(double[] V) {
     double[][][] Qs = new double[mdps.length][][];
     for (int actorDoing = 0; actorDoing < mdps.length; actorDoing++) {
-      Qs[actorDoing] = calculateQs(V[0], mdps[actorDoing]);
+      Qs[actorDoing] = calculateQs(V, mdps[actorDoing]);
     }
     
     int[][] chosenActs = calculateBestActions(Qs);
-    double[][] nextVs  = new double[mdps.length][];
-    for (int i = 0; i < mdps.length; i++) {
-      // nextVs[i] = calculateNextVs(i, Qs[i], chosenActs);
-      if (this.stores != null) {
+    double[] nextV     = calculateNextVs(Qs, chosenActs);
+    if (this.stores != null) {
+      for (int i = 0; i < this.stores.length; i++) {
         this.stores[i].Q = rotateQMat(Qs[0], i, mdps.length*World.Setup.getActorSize(), World.Setup.getActorSize());
-        this.stores[i].V = nextVs[i];
+        this.stores[i].V = rotateVTab(nextV, i, mdps.length*World.Setup.getActorSize(), World.Setup.getActorSize());
       }
-      else System.out.println(Arrays.deepToString(Qs));
     }
-    return nextVs;
+    else System.out.println(Arrays.deepToString(Qs));
+    return nextV;
   }
 
   /**
@@ -55,7 +60,7 @@ public record SymmetricVI(MDP[] mdps, int numIterations, ValueIterator.Storage[]
    * 
    * @return the - hopefully - improved set of values for each state in the parent {@code MDP}.
    */
-  public double[][] doXValueIterationSteps(double[][] V, int numIterations) {
+  public double[] doXValueIterationSteps(double[] V, int numIterations) {
     for (int i = 0; i < numIterations; i++) {
       V=doValueIterationStep(V);
     }
@@ -81,11 +86,15 @@ public record SymmetricVI(MDP[] mdps, int numIterations, ValueIterator.Storage[]
    * 
    * @return an array of state 'values'
    */
-  private double[] calculateNextVs(int actorNum, double[][] Qt, double[][] Qo, int[][] chosenActs) {
+  private double[] calculateNextVs(double[][][] Qs, int[][] chosenActs) {
     double[] ans = new double[mdps[0].numStates()];
 
     for (int s = 0; s < mdps[0].numStates(); s++) {
-      ans[s] = calculateNextV(actorNum, Qt[s], Qo[s], chosenActs[s]);
+      double[] values = new double[mdps.length];
+      for(int i = 0; i < mdps.length; i++) {
+        values[i] = Qs[i][s][chosenActs[s][i]];
+      }
+      ans[s] = calculateNextV(values);
     }
 
     return ans;
@@ -99,8 +108,8 @@ public record SymmetricVI(MDP[] mdps, int numIterations, ValueIterator.Storage[]
    * 
    * @return the maximum value possible from an action at a given state.
    */
-  private double calculateNextV(int actorNum, double[] sQt, double[] sQo, int[] chosenActs) {
-    return (sQt[chosenActs[actorNum]]+sQo[chosenActs[(actorNum+1)%chosenActs.length]])/2.0;
+  private double calculateNextV(double[] sQ) {
+    return DoubleStream.of(sQ).sum()/sQ.length;
   }
 
   /**
@@ -156,6 +165,14 @@ public record SymmetricVI(MDP[] mdps, int numIterations, ValueIterator.Storage[]
     double[][] res = new double[Q.length][];
     for (int s = 0; s < Q.length; s++) {
       res[s] = Q[rotateState(s, actor, stateSize, actorSize)];
+    }
+    return res;
+  }
+
+  private static double[] rotateVTab(double[] V, int actor, int stateSize, int actorSize) {
+    double[] res = new double[V.length];
+    for (int s = 0; s < V.length; s++) {
+      res[s] = V[rotateState(s, actor, stateSize, actorSize)];
     }
     return res;
   }
