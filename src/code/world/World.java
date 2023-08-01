@@ -17,6 +17,10 @@ import mki.math.vector.Vector2;
 import mki.ui.control.UIController;
 
 public abstract class World {
+  
+  private static final int VI_MODE_DUMB = 0;
+  private static final int VI_MODE_COMP = 1;
+  private static final int VI_MODE_SYMM = 2;
 
   private static double gamma = 0.9;
 
@@ -29,9 +33,9 @@ public abstract class World {
 
   private static int numActors = 2;
   private static ValueIterator.Storage[] actorBrains = new ValueIterator.Storage[0];
-  private static MDP[] actorMDPs = new MDP[0];
-
-  private static int VIMode = 2;
+  private static MDP[][] actorMDPs = new MDP[0][0];
+  
+    private static int VIMode = VI_MODE_COMP;
 
   private static int numMDPIterations = 100;
 
@@ -124,20 +128,22 @@ public abstract class World {
     }
 
     public static void initialiseMDPs() {
-      actorMDPs = new MDP[numActors*(World.VIMode==2?2:1)];
+      actorMDPs = new MDP
+        [VIMode == VI_MODE_SYMM ? 1 : numActors]
+        [VIMode == VI_MODE_DUMB ? 1 : numActors]
+      ;
 
       State.Encoder.resetStateTable();
       
       actorBrains = new ValueIterator.Storage[numActors];
-      for (int i = 0; i < numActors; i++) {
-        if (World.VIMode!=2) {
-          actorMDPs[i] = new OOMDP( gamma, possibleActions, i, i);
-        }
-        else {
-          actorMDPs[i*2] = new OOMDP( gamma, possibleActions, i, i);
-          actorMDPs[i*2+1] = new OOMDP( gamma, possibleActions, (i+1)%numActors, i);
-        }
+      for (int i = 0; i < actorMDPs.length; i++) {
         actorBrains[i] = new ValueIterator.Storage();
+
+        if (VIMode == VI_MODE_DUMB)
+          actorMDPs[i][0] = new OOMDP(gamma, possibleActions, i, i);
+        else for (int j = 0; j < actorMDPs[i].length; j++) {
+          actorMDPs[i][j] = new OOMDP(gamma, possibleActions, i, j);
+        }
       }
       
       World.Setup.ready = false;
@@ -147,16 +153,16 @@ public abstract class World {
       System.out.println("\nValue Iteration:");
       double[][] Vs = new double[numActors][];
       switch(World.VIMode){
-        case 0:
+        case VI_MODE_DUMB:
         for (int i = 0; i < actorMDPs.length; i++) {
-          Vs[i]=(new ValueIterator(actorMDPs[i], numMDPIterations, actorBrains[i]).doValueIteration());
+          Vs[i]=(new ValueIterator(actorMDPs[i][0], numMDPIterations, actorBrains[i]).doValueIteration());
         }
         break;
-        case 1:
+        case VI_MODE_COMP:
         Vs = new ComprehensiveVI(actorMDPs, numMDPIterations, actorBrains).doValueIteration();
         break;
-        case 2:
-        Vs = new SymmetricVI(new MDP[] {actorMDPs[0], actorMDPs[2]}, new MDP[] {actorMDPs[1], actorMDPs[3]}, numMDPIterations, actorBrains).doValueIteration();
+        case VI_MODE_SYMM:
+        // Vs = new SymmetricVI(actorMDPs, numMDPIterations, actorBrains).doValueIteration();
       }
       printVs(Vs);
 
@@ -173,7 +179,7 @@ public abstract class World {
 
   public static abstract class Player {
 
-    public static MDP[] getActorMDPs() {
+    public static MDP[][] getActorMDPs() {
       return actorMDPs;
     }
   
@@ -230,6 +236,10 @@ public abstract class World {
 
   public static abstract class Visualiser {
 
+    public static final double ACTOR_RING_RADIUS = 0.35;
+    public static final double INNER_RING_RADIUS = 0.15;
+    public static final double ACTOR_CIRC_RADIUS = 0.1;
+
     private static final Decal deer = new Decal("deer.png");
     private static final Color deerColour = new Color(27, 0, 15);
 
@@ -251,7 +261,8 @@ public abstract class World {
     public static void press(Vector2 p) {
       for (int i = 0; i < numActors; i++) {
         double ang = i/(numActors/2.0);
-        if (p.subtract(0.4*Math.sin(Math.PI*ang), 0.4*Math.cos(Math.PI*ang)).magnitude() < 0.0625) pressedActor = i;
+        if (p.subtract(ACTOR_RING_RADIUS*Math.sin(Math.PI*ang), ACTOR_RING_RADIUS*Math.cos(Math.PI*ang)).magnitude() < ACTOR_CIRC_RADIUS) 
+          pressedActor = i;
       }
       pressedIn = true;
     }
@@ -270,7 +281,7 @@ public abstract class World {
       if (
         pressedActor < 0 || 
         pressedActor == selectedActor || 
-        p.subtract(0.4*Math.sin(Math.PI*ang), 0.4*Math.cos(Math.PI*ang)).magnitude() >= 0.0625
+        p.subtract(ACTOR_RING_RADIUS*Math.sin(Math.PI*ang), ACTOR_RING_RADIUS*Math.cos(Math.PI*ang)).magnitude() >= ACTOR_CIRC_RADIUS
       ) {reset(); return;}
 
       UIController.displayTempElement(UICreator.generateCirclePanel(pressedActor));

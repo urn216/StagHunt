@@ -9,7 +9,7 @@ public class OOMDP implements MDP {
   private static final double COST_OF_LIVING  = -0;
   private static final double COST_OF_FAILING = Double.NEGATIVE_INFINITY;
 
-  public OOMDP(double gamma, Action[] actions, int actorDoing, int actorRecieving) {
+  public OOMDP(double gamma, Action[] actions, int actorRecieving, int actorDoing) {
     int sTot = State.Encoder.numberOfStates();
     int aTot = actions.length;
     double[][][] T = new double[sTot][aTot][sTot];

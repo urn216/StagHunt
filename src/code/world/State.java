@@ -123,13 +123,14 @@ public class State {
     this.actorPs = new Vector2[actors.length];
     this.actorObjPs = new Vector2[actors.length];
 
-    double r = 0.4;
+    double actR = World.Visualiser.ACTOR_RING_RADIUS;
+    double innR = World.Visualiser.INNER_RING_RADIUS;
 
     for (int i = 0; i < actors.length; i++) {
       double ang = i/(actors.length/2.0);
-      actorPs[i] = new Vector2(r*Math.sin(Math.PI*ang), r*Math.cos(Math.PI*ang));
-      ang -= 0.2;
-      actorObjPs[i] = new Vector2(r*0.75*Math.sin(Math.PI*ang), r*0.75*Math.cos(Math.PI*ang));
+      actorPs[i] = new Vector2(actR*Math.sin(Math.PI*ang), actR*Math.cos(Math.PI*ang));
+      ang -= 0.4;
+      actorObjPs[i] = new Vector2(innR*Math.sin(Math.PI*ang), innR*Math.cos(Math.PI*ang));
     }
   }
 

@@ -56,7 +56,7 @@ public class StagHunter extends Actor {
 
     int thisX = x + (int)(this.state.getActorPs()[actorNum].x*width+width/2);
     int thisY = y + (int)(this.state.getActorPs()[actorNum].y*height+height/2);
-    int size = height/8;
+    int size = (int)(height*World.Visualiser.ACTOR_CIRC_RADIUS*2);
 
     g.setStroke(new BasicStroke(height/64));
     g.setColor(colourText);

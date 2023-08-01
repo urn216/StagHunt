@@ -1,12 +1,13 @@
 package code.vi;
 
 import java.util.Arrays;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 import mki.math.MathHelp;
 import code.mdp.MDP;
 
-public record ComprehensiveVI(MDP[] mdps, int numIterations, ValueIterator.Storage[] stores) {
+public record ComprehensiveVI(MDP[][] mdps, int numIterations, ValueIterator.Storage[] stores) {
 
   /**
    * Runs the {@code CVIMaster} for its desired number of iterations under its {@code MDP}s
@@ -15,7 +16,7 @@ public record ComprehensiveVI(MDP[] mdps, int numIterations, ValueIterator.Stora
    * @return a set of percieved 'values' for each possible state within each present {@code MDP}
    */
   public double[][] doValueIteration() {
-    return doXValueIterationSteps(new double[mdps.length][mdps[0].numStates()], numIterations);
+    return doXValueIterationSteps(new double[mdps.length][mdps[0][0].numStates()], numIterations);
   }
 
   /**
@@ -27,20 +28,22 @@ public record ComprehensiveVI(MDP[] mdps, int numIterations, ValueIterator.Stora
    * @return the - hopefully - improved set of values for each state in the parent {@code MDP}s.
    */
   public double[][] doValueIterationStep(double[][] V) {
-    double[][][] Qs = new double[mdps.length][][];
-    for (int i = 0; i < mdps.length; i++) {
-      Qs[i] = calculateQs(V[i], mdps[i]);
+    double[][][] Qs = new double[mdps.length*mdps.length][][];
+    for (int actorRecieving = 0; actorRecieving < mdps.length; actorRecieving++) {
+      for(int actorDoing = 0; actorDoing < mdps.length; actorDoing++) {
+        Qs[actorRecieving*mdps.length + actorDoing] = calculateQs(V[actorRecieving], mdps[actorRecieving][actorDoing]);
+      }
     }
     
-    int[][] chosenActs = calculateBestActions(Qs); //TODO maybe store resulting states?
-    double[][] nextVs = new double[mdps.length][];
+    int[][] chosenActs = calculateBestActions(Qs);
+    double[][] nextVs  = new double[mdps.length][];
     for (int i = 0; i < mdps.length; i++) {
-      nextVs[i] = calculateNextVs(Qs[i], chosenActs);
+      nextVs[i] = calculateNextVs(i, Qs, chosenActs);
       if (this.stores != null) {
-        this.stores[i].Q = Qs[i];
+        this.stores[i].Q = Qs[i*mdps.length+i];
         this.stores[i].V = nextVs[i];
       }
-      else System.out.println(Arrays.deepToString(Qs[i]));
+      else System.out.println(Arrays.deepToString(Qs[i*mdps.length+i]));
     }
     return nextVs;
   }
@@ -63,10 +66,10 @@ public record ComprehensiveVI(MDP[] mdps, int numIterations, ValueIterator.Stora
   }
 
   private int[][] calculateBestActions(double[][][] Qs) {
-    int[][] res = new int[Qs[0].length][Qs.length];
+    int[][] res = new int[Qs[0].length][mdps.length];
     for (int s = 0; s < Qs[0].length; s++) {
       for (int i = 0; i < mdps.length; i++) {
-        res[s][i] = MathHelp.argMax(Qs[i][s]);
+        res[s][i] = MathHelp.argMax(Qs[i*mdps.length + i][s]);
       }
     }
     return res;
@@ -81,11 +84,15 @@ public record ComprehensiveVI(MDP[] mdps, int numIterations, ValueIterator.Stora
    * 
    * @return an array of state 'values'
    */
-  private double[] calculateNextVs(double[][] Q, int[][] chosenActs) {
-    double[] ans = new double[mdps[0].numStates()];
+  private double[] calculateNextVs(int actorNum, double[][][] Qs, int[][] chosenActs) {
+    double[] ans = new double[mdps[0][0].numStates()];
 
-    for (int s = 0; s < mdps[0].numStates(); s++) {
-      ans[s] = calculateNextV(Q[s], chosenActs[s]);
+    for (int s = 0; s < mdps[0][0].numStates(); s++) {
+      double[] values = new double[mdps.length];
+      for(int i = 0; i < mdps.length; i++) {
+        values[i] = Qs[actorNum*mdps.length + i][s][chosenActs[s][i]];
+      }
+      ans[s] = calculateNextV(values);
     }
 
     return ans;
@@ -99,8 +106,8 @@ public record ComprehensiveVI(MDP[] mdps, int numIterations, ValueIterator.Stora
    * 
    * @return the average of all the chosen actions' value to a single VI
    */
-  private double calculateNextV(double[] sQ, int[] chosenActs) {
-    return IntStream.of(chosenActs).mapToDouble((i) -> sQ[i]).sum()/chosenActs.length;
+  private double calculateNextV(double[] sQ) {
+    return DoubleStream.of(sQ).sum()/sQ.length;
   }
 
   /**

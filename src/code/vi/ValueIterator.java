@@ -28,11 +28,11 @@ public record ValueIterator(MDP mdp, int numIterations, Storage store) {
    * @return the - hopefully - improved set of values for each state in the parent {@code MDP}.
    */
   public double[] doValueIterationStep(double[] V) {
-    double[][]   Q = calculateQs(V);
-    double[] nextV = calculateNextVs(Q);
+    double[][]   Q  = calculateQs(V);
+    double[] nextV  = calculateNextVs(Q);
     if (this.store != null) {
-      this.store.Q = Q;
-      this.store.V = nextV;
+      this.store.Q  = Q;
+      this.store.V  = nextV;
     }
     else System.out.println(Arrays.deepToString(Q));
     return nextV;
