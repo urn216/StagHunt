@@ -236,8 +236,8 @@ public abstract class World {
 
   public static abstract class Visualiser {
 
-    public static final double ACTOR_RING_RADIUS = 0.35;
-    public static final double INNER_RING_RADIUS = 0.15;
+    public static final double ACTOR_RING_RADIUS = 0.36;
+    public static final double INNER_RING_RADIUS = 0.2;
     public static final double ACTOR_CIRC_RADIUS = 0.1;
 
     private static final Decal deer = new Decal("deer.png");
@@ -292,7 +292,7 @@ public abstract class World {
     }
 
     public static void drawMoveTree() {
-      MoveTree.drawMoveTree(720);
+      MoveTree.drawMoveTree(480);
     }
 
     /**

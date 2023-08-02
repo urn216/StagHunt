@@ -126,10 +126,12 @@ public class State {
     double actR = World.Visualiser.ACTOR_RING_RADIUS;
     double innR = World.Visualiser.INNER_RING_RADIUS;
 
+    double innOff = 1.0/actors.length;
+
     for (int i = 0; i < actors.length; i++) {
       double ang = i/(actors.length/2.0);
       actorPs[i] = new Vector2(actR*Math.sin(Math.PI*ang), actR*Math.cos(Math.PI*ang));
-      ang -= 0.4;
+      ang -= innOff;
       actorObjPs[i] = new Vector2(innR*Math.sin(Math.PI*ang), innR*Math.cos(Math.PI*ang));
     }
   }

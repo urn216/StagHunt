@@ -75,6 +75,7 @@ public abstract class MoveTree {
           else child = visitedStates.get(visitedStates.indexOf(child));
           
           node.children.add(child);
+          node.childInt.add(j);
         } else node.exitState = true;
       }
     }
@@ -110,6 +111,7 @@ public abstract class MoveTree {
     public final int encoded;
     public final int layer;
     public final List<TreeNode> children = new ArrayList<>();
+    public final List<Integer>  childInt = new ArrayList<>();
 
     public boolean exitState = false;
 
@@ -132,9 +134,10 @@ public abstract class MoveTree {
     private void drawArrows(Graphics2D g, int size) {
       g.setStroke(new BasicStroke(size/32));
 
-      g.setColor(Color.black); //TODO not black
       for (int i = 0; i < children.size(); i++) {
-        g.drawLine(x, y, children.get(i).x, children.get(i).y);
+        TreeNode next = children.get(i);
+        g.setColor(next.state.getActors()[childInt.get(i)].getBodyColour());
+        g.drawLine(x, y, next.x, next.y);
       }
 
       g.setStroke(new BasicStroke(1));
