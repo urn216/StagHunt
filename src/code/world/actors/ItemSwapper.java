@@ -53,9 +53,10 @@ public class ItemSwapper extends Actor {
 
   @Override
   public boolean exitCondition() {
-    return state.allActorsCond((a) -> !((ItemSwapper)a).holdOther)
-    &&    (state.leftOfMeCond ((a) -> !((ItemSwapper)a).holdRight, actorNum) || !holdLeft )
-    &&    (state.rightOfMeCond((a) -> !((ItemSwapper)a).holdLeft , actorNum) || !holdRight);
+    return !holdOther 
+    &&  state.rightOfMeCond((a) -> !((ItemSwapper)a).holdOther, actorNum)
+    && (state.leftOfMeCond ((a) -> !((ItemSwapper)a).holdRight, actorNum) || !holdLeft )
+    && (state.rightOfMeCond((a) -> !((ItemSwapper)a).holdLeft , actorNum) || !holdRight);
   }
 
   @Override
