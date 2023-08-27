@@ -43,10 +43,10 @@ public abstract class Core {
     quit = true;
   }
 
-  public static void printWorld(int size) {
+  public static void printWorld(String filename, int size) {
     BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
     World.Visualiser.draw(img.createGraphics(), size, size);
-    FileIO.writeImage("../output.png", img);
+    FileIO.writeImage("../screenshots/"+filename + (filename.endsWith(".png") ? "" : ".png"), img);
   }
   
   /**

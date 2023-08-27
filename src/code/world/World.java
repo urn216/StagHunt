@@ -44,7 +44,7 @@ public abstract class World {
     private static boolean ready = false;
 
     static {
-      setActorType(ItemSwapper.class);
+      setActorType(PrisonerDilemmee.class);
     }
 
     public static double getGamma() {
@@ -292,7 +292,7 @@ public abstract class World {
     }
 
     public static void drawMoveTree() {
-      MoveTree.drawMoveTree(480);
+      MoveTree.drawMoveTree("init_state_tree", 480);
     }
 
     /**

@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JFrame;
 
+import code.world.State;
 import code.world.World;
 
 import mki.math.vector.Vector2;
@@ -76,7 +77,11 @@ abstract class Controls {
         
         // System.out.print(keyCode);
         if (keyCode == KeyEvent.VK_F2) {
-          Core.printWorld(1080);
+          Core.printWorld("screenshot_"+Integer.toBinaryString(State.Encoder.encode(World.Player.getState())), 1080);
+          return;
+        }
+        if (keyCode == KeyEvent.VK_F1) {
+          MoveTree.drawMoveTree("tree_from_"+Integer.toBinaryString(State.Encoder.encode(World.Player.getState())), 480);
           return;
         }
         if (keyCode == KeyEvent.VK_F11) {

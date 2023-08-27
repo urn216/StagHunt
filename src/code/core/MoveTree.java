@@ -27,7 +27,7 @@ public abstract class MoveTree {
    * 
    * @param stateSize the size in pixels of each node in the tree
    */
-  public static void drawMoveTree(int stateSize) {
+  public static void drawMoveTree(String filename, int stateSize) {
 
     TreeNode[][] layers = initTree();
 
@@ -46,7 +46,7 @@ public abstract class MoveTree {
       node.drawState(g, node.exitState ? node.children.isEmpty() ? green : yellow : x==0 ? blue : grey, stateSize);
     });
 
-    FileIO.writeImage("../tree.png", img);
+    FileIO.writeImage("../screenshots/"+filename + (filename.endsWith(".png") ? "" : ".png"), img);
   }
 
   /**
