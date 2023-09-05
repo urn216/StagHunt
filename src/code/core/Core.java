@@ -59,11 +59,6 @@ public abstract class Core {
       if (quit) {
         System.exit(0);
       }
-      for (int i = 0; i < 10; i++)
-        if (Controls.KEY_DOWN['0'+i]) {World.Player.progressState(i); Controls.KEY_DOWN['0'+i] = false;}
-      for (int i = 0; i < 5; i++)
-        if (Controls.KEY_DOWN['A'+i]) {World.Player.actInState(0, i); Controls.KEY_DOWN['A'+i] = false;}
-      if (Controls.KEY_DOWN['\b']) {World.Player.regressState();   Controls.KEY_DOWN['\b'] = false;}
       
       WINDOW.PANEL.repaint();
       tickTime = System.currentTimeMillis() - tickTime;

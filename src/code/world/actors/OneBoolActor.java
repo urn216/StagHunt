@@ -1,41 +1,34 @@
 package code.world.actors;
 
-import java.awt.Graphics2D;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 
 import code.world.State;
 import code.world.World;
-import mki.math.MathHelp;
 
-public class PrisonerDilemmee extends Actor {
+public class OneBoolActor extends Actor {
 
   private static final int SIZE = 1;
 
   public static final int size() {return SIZE;}
 
-  private static final int TAKE_CASH_MASK = 0b01;
+  public static int[] ACTOR_0_VALS = {1, 2, 3, 4};
+  public static int[] ACTOR_1_VALS = {1, 2, 3, 4};
 
-  private static final double cashValue = 100;
-  
+  protected final int value;
+
   protected final String character;
 
-  protected final boolean takeCash;
-
-  /**
-   * Creates a new {@code Actor} with given parameters.
-   */
-  public PrisonerDilemmee(State state, int actorNum, int encoded) {
+  public OneBoolActor(State state, int actorNum, int encoded) {
     super(state, actorNum, encoded);
-    this.takeCash = MathHelp.intToBoolean(encoded&TAKE_CASH_MASK);
-    this.character = takeCash ? "T" : "L";
+    this.value = actorNum == 0 ? ACTOR_0_VALS[state.getDebugEncoding()] : ACTOR_1_VALS[state.getDebugEncoding()];
+    this.character = ""+this.value;
   }
 
   @Override
   public double exitReward() {
-    return takeCash ? 
-      state.allActorsCond((a) -> ((PrisonerDilemmee)a).takeCash) ? 0 : cashValue: 
-      state.allActorsCond((a) -> !((PrisonerDilemmee)a).takeCash) ? cashValue/2 : 0;
+    return this.value;
   }
 
   @Override
@@ -57,5 +50,4 @@ public class PrisonerDilemmee extends Actor {
 
     g.drawString(character, x-met.stringWidth(character)/2, y+met.getDescent()+met.getLeading());
   }
-  
 }

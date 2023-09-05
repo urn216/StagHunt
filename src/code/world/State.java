@@ -43,7 +43,7 @@ public class State {
       if (stateTable[state] == null) {
         Actor[] actors = new Actor[state == stateTable.length - 1 ? 0 : World.Setup.getNumActors()];
         
-        stateTable[state] = new State(actors);
+        stateTable[state] = new State(state, actors);
         
         for (int i = 0; i < actors.length; i++) {
           try {
@@ -105,6 +105,7 @@ public class State {
   private final Actor[] actors;
   private final Vector2[] actorPs;
   private final Vector2[] actorObjPs;
+  private final int encoded;
 
   /**
    * Hidden constructor for {@code State} objects.
@@ -112,12 +113,14 @@ public class State {
    * @param actors {@code array} of {@code Actor}s. Must be of size 
    * {@code numActors} or empty to represent the 'exit' {@code State}
    */
-  private State(Actor... actors) {
+  private State(int state, Actor... actors) {
     if (actors.length != World.Setup.getNumActors() && actors.length != 0) {
       throw new RuntimeException(
         "Invalid number of Actors! Expected " + World.Setup.getNumActors() + ", but recieved " + actors.length
       );
     }
+
+    this.encoded = state;
 
     this.actors = actors;
     this.actorPs = new Vector2[actors.length];
@@ -135,6 +138,8 @@ public class State {
       actorObjPs[i] = new Vector2(innR*Math.sin(Math.PI*ang), innR*Math.cos(Math.PI*ang));
     }
   }
+
+  public int getDebugEncoding() {return encoded;}
 
   /**
    * Gets the {@code Actor}s in their current condition at this {@code State}.
@@ -231,11 +236,11 @@ public class State {
     return ac.find(actors[(actorNum+1)%actors.length]);
   }
 
-  public State changeActor(int i, Actor newActor) {
+  public State changeActor(int i, int newActorEncoding) {
     int encoded = (
       State.Encoder.encode(this) & ~(((1 << World.Setup.getActorSize()) - 1) << (i * World.Setup.getActorSize()))
     ) | (
-      newActor.encoded() << (i * World.Setup.getActorSize())
+      newActorEncoding << (i * World.Setup.getActorSize())
     );
     // System.out.println("Actor " + i + ": " + encode(this) + " -> " + encoded);
     return State.Encoder.decode(encoded);

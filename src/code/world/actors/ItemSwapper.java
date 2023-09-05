@@ -36,7 +36,7 @@ public class ItemSwapper extends Actor {
     this.holdLeft  = MathHelp.intToBoolean(encoded&HOLD_LEFT_MASK );
     this.holdOther = MathHelp.intToBoolean(encoded&HOLD_OTHER_MASK);
     this.holdRight = MathHelp.intToBoolean(encoded&HOLD_RIGHT_MASK);
-    this.character = "" + (char)(actorNum + 65);
+    this.character = "" + (char)(actorNum + 'A');
   }
 
   @Override
@@ -57,11 +57,6 @@ public class ItemSwapper extends Actor {
     &&  state.rightOfMeCond((a) -> !((ItemSwapper)a).holdOther, actorNum)
     && (state.leftOfMeCond ((a) -> !((ItemSwapper)a).holdRight, actorNum) || !holdLeft )
     && (state.rightOfMeCond((a) -> !((ItemSwapper)a).holdLeft , actorNum) || !holdRight);
-  }
-
-  @Override
-  protected Actor replace(int encoded) {
-    return new StagHunter(this.state, this.actorNum, encoded);
   }
 
   // @Override

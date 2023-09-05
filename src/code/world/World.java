@@ -44,7 +44,7 @@ public abstract class World {
     private static boolean ready = false;
 
     static {
-      setActorType(PrisonerDilemmee.class);
+      setActorType(OneBoolActor.class);
     }
 
     public static double getGamma() {

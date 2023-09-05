@@ -76,6 +76,15 @@ abstract class Controls {
         KEY_DOWN[keyCode] = true;
         
         // System.out.print(keyCode);
+        for (int i = 0; i < 10; i++)
+          if (keyCode == '0'+i) {World.Player.progressState(i); return;}
+        for (int i = 0; i < 5; i++)
+          if (keyCode == 'A'+i) {World.Player.actInState(0, i); return;}
+        
+        if (keyCode == KeyEvent.VK_BACK_SPACE) {
+          World.Player.regressState();
+          return;
+        }
         if (keyCode == KeyEvent.VK_F2) {
           Core.printWorld("screenshot_"+Integer.toBinaryString(State.Encoder.encode(World.Player.getState())), 1080);
           return;

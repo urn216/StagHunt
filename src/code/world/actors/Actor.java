@@ -49,16 +49,23 @@ public abstract class Actor {
   public int encoded() {
     return this.encoded;
   }
+  
+  /**
+   * Gets the size in bits of this {@code Actor}
+   * 
+   * @return the number of bits in this {@code Actor}
+   */
+  public static int size() {return 1;}
 
   public abstract double exitReward();
 
   public abstract boolean exitCondition();
 
-  protected abstract Actor replace(int encoded);
-
   public State toggleBool(int bool) {
     if (bool >= World.Setup.getActorSize()) throw new IndexOutOfBoundsException(bool);
-    return state.changeActor(this.actorNum, replace(MathHelp.toggleBit(encoded, bool)));
+    try {
+      return state.changeActor(this.actorNum, MathHelp.toggleBit(encoded, bool));
+    } catch (Exception e) {return null;}
   }
 
   public State getState() {

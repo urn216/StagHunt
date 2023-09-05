@@ -47,11 +47,6 @@ public class StagHunter extends Actor {
   }
 
   @Override
-  protected Actor replace(int encoded) {
-    return new StagHunter(this.state, this.actorNum, encoded);
-  }
-
-  @Override
   public void draw(Graphics2D g, int x, int y, int width, int height) {
 
     int thisX = x + (int)(this.state.getActorPs()[actorNum].x*width+width/2);
