@@ -3,27 +3,39 @@ package code.world.actors;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.util.function.BiFunction;
 
 import code.world.State;
 import code.world.World;
+import mki.math.MathHelp;
 
-public class OneBoolActor extends Actor {
+public class TwoBoolActor extends Actor {
 
-  private static final int SIZE = 1;
+  private static final int SIZE = 2;
 
   public static final int size() {return SIZE;}
 
   public static int[] ACTOR_0_VALS = {1, 2, 3, 4};
   public static int[] ACTOR_1_VALS = {1, 2, 3, 4};
 
+  public static BiFunction<State, Integer, Boolean> exitCond = (state, actorNum) -> state.allActorsCond((a) -> !((TwoBoolActor)a).holding);
+
   protected final int value;
+
+  protected final boolean holding;
 
   protected final String character;
 
-  public OneBoolActor(State state, int actorNum, int encoded) {
+  public TwoBoolActor(State state, int actorNum, int encoded) {
     super(state, actorNum, encoded);
-    this.value = actorNum == 0 ? ACTOR_0_VALS[state.getDebugEncoding()] : ACTOR_1_VALS[state.getDebugEncoding()];
+    this.holding = MathHelp.intToBoolean(encoded&0b10);
+    int index = (state.getDebugEncoding()&1)+2*((state.getDebugEncoding()>>2)&1);
+    this.value = actorNum == 0 ? ACTOR_0_VALS[index] : ACTOR_1_VALS[index];
     this.character = ""+this.value;
+  }
+
+  public boolean isHolding() {
+    return holding;
   }
 
   @Override
@@ -33,7 +45,7 @@ public class OneBoolActor extends Actor {
 
   @Override
   public boolean exitCondition() {
-    return true;
+    return exitCond.apply(state, actorNum);
   }
 
   @Override

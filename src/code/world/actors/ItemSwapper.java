@@ -70,7 +70,7 @@ public class ItemSwapper extends Actor {
 
     int thisX = x + (int)(this.state.getActorPs()[actorNum].x*width+width/2);
     int thisY = y + (int)(this.state.getActorPs()[actorNum].y*height+height/2);
-    int size = (int)(height*World.Visualiser.ACTOR_CIRC_RADIUS*2);
+    int size = (int)(height*World.Visualiser.getActorCircRadius()*2);
 
     int objX = x + (int)(this.state.getActorObjPs()[actorNum].x*width+width/2);
     int objY = y + (int)(this.state.getActorObjPs()[actorNum].y*height+height/2);

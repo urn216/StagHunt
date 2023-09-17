@@ -48,7 +48,7 @@ public class PrisonerDilemmee extends Actor {
 
     x += (int)(this.state.getActorPs()[actorNum].x*width+width/2);
     y += (int)(this.state.getActorPs()[actorNum].y*height+height/2);
-    int size = (int)(height*World.Visualiser.ACTOR_CIRC_RADIUS*2);
+    int size = (int)(height*World.Visualiser.getActorCircRadius()*2);
 
     Actor.drawCircle(g, colourBody, colourText, x, y, size);
     

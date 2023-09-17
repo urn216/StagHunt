@@ -18,9 +18,9 @@ import mki.ui.control.UIController;
 
 public abstract class World {
   
-  private static final int VI_MODE_DUMB = 0;
-  private static final int VI_MODE_COMP = 1;
-  private static final int VI_MODE_SYMM = 2;
+  public static final int VI_MODE_DUMB = 0;
+  public static final int VI_MODE_COMP = 1;
+  public static final int VI_MODE_SYMM = 2;
 
   private static double gamma = 0.9;
 
@@ -35,7 +35,7 @@ public abstract class World {
   private static ValueIterator.Storage[] actorBrains = new ValueIterator.Storage[0];
   private static MDP[][] actorMDPs = new MDP[0][0];
   
-    private static int VIMode = VI_MODE_SYMM;
+    private static int VIMode = VI_MODE_COMP;
 
   private static int numMDPIterations = 100;
 
@@ -236,16 +236,49 @@ public abstract class World {
 
   public static abstract class Visualiser {
 
-    public static final double ACTOR_RING_RADIUS = 0.36;
-    public static final double INNER_RING_RADIUS = 0.2;
-    public static final double ACTOR_CIRC_RADIUS = 0.1;
-
     private static final Decal deer = new Decal("deer.png");
     private static final Color deerColour = new Color(27, 0, 15);
 
     private static boolean pressedIn = false;
     private static int pressedActor = -1;
     private static int selectedActor = -1;
+
+    private static double actorRingRadius = 0.36;
+    private static double innerRingRadius = 0.2;
+    private static double actorCircRadius = 0.1;
+    private static boolean offset45 = false;
+
+    public static double getActorCircRadius() {
+      return actorCircRadius;
+    }
+
+    public static double getActorRingRadius() {
+      return actorRingRadius;
+    }
+
+    public static double getInnerRingRadius() {
+      return innerRingRadius;
+    }
+
+    public static boolean isOffset45() {
+      return offset45;
+    }
+
+    public static void setActorCircRadius(double actorCircRadius) {
+      Visualiser.actorCircRadius = actorCircRadius;
+    }
+
+    public static void setActorRingRadius(double actorRingRadius) {
+      Visualiser.actorRingRadius = actorRingRadius;
+    }
+
+    public static void setInnerRingRadius(double innerRingRadius) {
+      Visualiser.innerRingRadius = innerRingRadius;
+    }
+
+    public static void setOffset45(boolean offset45) {
+      Visualiser.offset45 = offset45;
+    }
 
     /**
      * Resets the visualisation of the {@code World}.
@@ -261,7 +294,7 @@ public abstract class World {
     public static void press(Vector2 p) {
       for (int i = 0; i < numActors; i++) {
         double ang = i/(numActors/2.0);
-        if (p.subtract(ACTOR_RING_RADIUS*Math.sin(Math.PI*ang), ACTOR_RING_RADIUS*Math.cos(Math.PI*ang)).magnitude() < ACTOR_CIRC_RADIUS) 
+        if (p.subtract(actorRingRadius*Math.sin(Math.PI*ang), actorRingRadius*Math.cos(Math.PI*ang)).magnitude() < actorCircRadius) 
           pressedActor = i;
       }
       pressedIn = true;
@@ -281,7 +314,7 @@ public abstract class World {
       if (
         pressedActor < 0 || 
         pressedActor == selectedActor || 
-        p.subtract(ACTOR_RING_RADIUS*Math.sin(Math.PI*ang), ACTOR_RING_RADIUS*Math.cos(Math.PI*ang)).magnitude() >= ACTOR_CIRC_RADIUS
+        p.subtract(actorRingRadius*Math.sin(Math.PI*ang), actorRingRadius*Math.cos(Math.PI*ang)).magnitude() >= actorCircRadius
       ) {reset(); return;}
 
       UIController.displayTempElement(UICreator.generateCirclePanel(pressedActor));

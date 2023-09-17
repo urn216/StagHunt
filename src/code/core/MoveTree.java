@@ -13,6 +13,9 @@ import mki.io.FileIO;
 
 import code.world.State;
 import code.world.World;
+import code.world.actors.Actor;
+import code.world.actors.OneBoolActor;
+import code.world.actors.TwoBoolActor;
 
 public abstract class MoveTree {
 
@@ -108,7 +111,6 @@ public abstract class MoveTree {
    */
   private static class TreeNode {
     public final State state;
-    public final int encoded;
     public final int layer;
     public final List<TreeNode> children = new ArrayList<>();
     public final List<Integer>  childInt = new ArrayList<>();
@@ -120,7 +122,6 @@ public abstract class MoveTree {
 
     public TreeNode(State state, int layer) {
       this.state = state;
-      this.encoded = State.Encoder.encode(state);
       this.layer = layer;
     }
 
@@ -169,13 +170,94 @@ public abstract class MoveTree {
     public boolean equals(Object o) {
       if (!(o instanceof TreeNode n)) return false;
 
-      return this.encoded==n.encoded;
+      return this.state.getDebugEncoding()==n.state.getDebugEncoding();
     }
 
     @Override
     public String toString() {
       String buffer = "%"+(State.Encoder.size()-1)+"s";
-      return layer + ": " + String.format(buffer, Integer.toBinaryString(encoded)).replace(' ', '0');
+      return layer + ": " + String.format(buffer, Integer.toBinaryString(state.getDebugEncoding())).replace(' ', '0');
     }
+  }
+
+  //           //
+  // MOVE GRID //
+  //           //
+
+  public static void drawMoveGrid(String filename, double gamma, int stateSize, Class<? extends Actor> actorType) throws Exception {
+    World.Setup.setActorType(actorType);
+    World.Setup.setNumActors(2);
+    World.Setup.setVIMode(World.VI_MODE_COMP);
+    World.Setup.setGamma(gamma);
+
+    World.Visualiser.setActorRingRadius(0.3);
+    World.Visualiser.setActorCircRadius(0.23);
+    World.Visualiser.setOffset45(true);
+
+    int buffer = stateSize/8;
+
+    BufferedImage img = new BufferedImage((stateSize*2+buffer)*12-buffer, (stateSize*2+buffer)*12-buffer, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = img.createGraphics();
+
+    for (int i = 0; i < 6; i++) {
+      int aa = 1;
+      int ab = i/2 + 2;
+      int ac = ((i+3)%6)/2 + 2;
+      int ad = ((5-i)%3) + 2;
+
+      actorType.getDeclaredField("ACTOR_0_VALS").set(null, new int[]{aa, ab, ac, ad});
+
+      for (int j = 0; j < 24; j++) {
+        int ba = j/6+1;
+        int bb = (j%6)/2 + 2;
+        if (bb==ba) bb = 1;
+        int bc = (((j%6)+3)%6)/2 + 2;
+        if (bc==ba) bc = 1;
+        int bd = ((5-(j%6))%3) + 2;
+        if (bd==ba) bd = 1;
+
+        actorType.getDeclaredField("ACTOR_1_VALS").set(null, new int[]{ba, bb, bc, bd});
+
+        World.Setup.initialiseMDPs(); 
+        World.Setup.doVI();
+
+        drawGridMDP(g, stateSize, (stateSize*2+buffer)*(j%12), (stateSize*2+buffer)*(j/12 + i*2));
+      }
+    }
+
+    FileIO.writeImage(filename, img);
+  }
+
+  private static void drawGridMDP(Graphics2D g, int stateSize, int x, int y) {
+    for (int i = 0; i < 2; i++) {
+      for (int j = 0; j < 2; j++) {
+        State s = State.Encoder.decode(i + (j<<World.Setup.getActorSize()));
+        World.Player.setState(s);
+
+        Color c = World.Player.getBestNextStateFromActor(s, 0).getActors().length == 0 ? yellow : grey;
+        c = World.Player.getBestNextStateFromActor(s, 1).getActors().length == 0 ? c == yellow ? green : yellow : c;
+
+        g.setStroke(new BasicStroke(stateSize/32));
+    
+        g.setColor(c);
+        g.fillRect(x+i*stateSize, y+j*stateSize, stateSize, stateSize);
+    
+        g.setColor(c.brighter());
+        g.drawRect(x+i*stateSize, y+j*stateSize, stateSize, stateSize);
+    
+        g.setStroke(new BasicStroke(1));
+        s.draw(g,  x+i*stateSize, y+j*stateSize, stateSize, stateSize);
+      }
+    }
+  }
+
+  public static void main(String[] args) throws Exception {
+    drawMoveGrid("StagHunt/screenshots/AllGames_0_NoDiscount.png", 1, 360, OneBoolActor.class);
+    drawMoveGrid("StagHunt/screenshots/AllGames_1_Discount.png", 0.99, 360, OneBoolActor.class);
+    drawMoveGrid("StagHunt/screenshots/AllGames_2_Holds.png", 0.99, 360, TwoBoolActor.class);
+    TwoBoolActor.exitCond = (state, actorNum) -> state.allButMeCond((a) -> !((TwoBoolActor)a).isHolding(), actorNum);
+    drawMoveGrid("StagHunt/screenshots/AllGames_3_StrongHolds.png", 0.99, 360, TwoBoolActor.class);
+    TwoBoolActor.exitCond = (state, actorNum) -> state.allButMeCond((a) -> !((TwoBoolActor)a).isHolding(), (actorNum+1)%2);
+    drawMoveGrid("StagHunt/screenshots/AllGames_4_ReducedFreedom.png", 0.99, 360, TwoBoolActor.class);
   }
 }
