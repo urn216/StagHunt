@@ -44,7 +44,7 @@ public abstract class World {
     private static boolean ready = false;
 
     static {
-      setActorType(OneBoolActor.class);
+      setActorType(StagHunter.class);
     }
 
     public static double getGamma() {
@@ -91,6 +91,7 @@ public abstract class World {
           |    SecurityException e) {
         e.printStackTrace();
       }
+      World.Player.setState(State.Encoder.decode(0b0));
       World.Setup.ready = false;
     }
 

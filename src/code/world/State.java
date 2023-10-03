@@ -37,7 +37,7 @@ public class State {
      * @return a {@code State} represented by the given {@code int}
      */
     public static State decode(int state) {
-      if (stateTable.length!=numberOfStates()) stateTable = new State[numberOfStates()];
+      if (stateTable == null || stateTable.length!=numberOfStates()) stateTable = new State[numberOfStates()];
       state = Math.min(state, stateTable.length-1);
   
       if (stateTable[state] == null) {

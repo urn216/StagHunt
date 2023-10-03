@@ -19,10 +19,11 @@ import code.world.actors.TwoBoolActor;
 
 public abstract class MoveTree {
 
-  private static final Color blue = new Color(50, 50, 130);
-  private static final Color green = new Color(50, 130, 50);
-  private static final Color yellow = new Color(130, 130, 50);
-  private static final Color grey = new Color(130, 130, 130);
+  private static final Color red    = new Color(200, 50 , 50 );
+  private static final Color yellow = new Color(200, 200, 50 );
+  private static final Color green  = new Color(50 , 200, 50 );
+  private static final Color blue   = new Color(50 , 50 , 200);
+  private static final Color grey   = new Color(100, 100, 100);
 
   /**
    * Draws a network of 'optimal' {@code State} instances branching out from the {@code World}'s 
@@ -234,8 +235,8 @@ public abstract class MoveTree {
         State s = State.Encoder.decode(i + (j<<World.Setup.getActorSize()));
         World.Player.setState(s);
 
-        Color c = World.Player.getBestNextStateFromActor(s, 0).getActors().length == 0 ? yellow : grey;
-        c = World.Player.getBestNextStateFromActor(s, 1).getActors().length == 0 ? c == yellow ? green : yellow : c;
+        Color c = World.Player.getBestNextStateFromActor(s, 0).getActors().length == 0 ? red : grey;
+        c = World.Player.getBestNextStateFromActor(s, 1).getActors().length == 0 ? c == red ? green : blue : c;
 
         g.setStroke(new BasicStroke(stateSize/32));
     

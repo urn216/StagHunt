@@ -86,9 +86,19 @@ public class UICreator {
         1, 
         10
       ),
-      new UIDropDown("VI Mode: %s", new UIDropDown.Option("Individual", () -> World.Setup.setVIMode(0))),//dropdown menu: 'fast independant', 'comprehensive', 'symmetrical'
-      new UIButton("Stag Hunt", ()->{World.Setup.setActorType(StagHunter.class);World.Player.setState(State.Encoder.decode(0b0));}),
-      new UIButton("Item Swap", ()->{World.Setup.setActorType(ItemSwapper.class);World.Player.setState(State.Encoder.decode(0b0));}),
+      new UIDropDown("VI Mode: %s", 
+        new UIDropDown.Option("Individual", () -> World.Setup.setVIMode(World.VI_MODE_DUMB)), 
+        new UIDropDown.Option("Comprehensive", () -> World.Setup.setVIMode(World.VI_MODE_COMP)),
+        new UIDropDown.Option("Symmetrical", () -> World.Setup.setVIMode(World.VI_MODE_SYMM))
+      ),
+      new UIDropDown("MDP Mode: %s", 
+        new UIDropDown.Option("Final Reward", () -> World.Setup.setVIMode(World.VI_MODE_DUMB)), 
+        new UIDropDown.Option("Step Rewards", () -> World.Setup.setVIMode(World.VI_MODE_COMP))
+      ),
+      new UIDropDown("Game: %s",
+        new UIDropDown.Option("Stag Hunt", ()->World.Setup.setActorType(StagHunter.class)),
+        new UIDropDown.Option("Item Swap", ()->World.Setup.setActorType(ItemSwapper.class))
+      ),
       new UIButton("Return To Menu", UIController::back),
     },
     UIElement.TRANSITION_SLIDE_LEFT
