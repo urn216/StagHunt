@@ -1,0 +1,107 @@
+%% $RCSfile: proj_report_outline.tex,v $
+%% $Revision: 1.3 $
+%% $Date: 2016/06/10 03:41:54 $
+%% $Author: kevin $
+
+\documentclass[11pt
+              , a4paper
+              , twoside
+              , openright
+              ]{report}
+
+
+\usepackage{float} % lets you have non-floating floats
+
+\usepackage{url} % for typesetting urls
+
+\usepackage{hyperref}
+
+%
+%  We don't want figures to float so we define
+%
+\newfloat{fig}{thp}{lof}[chapter]
+\floatname{fig}{Figure}
+
+%% These are standard LaTeX definitions for the document
+%%                            
+\title{Decision-Making in One-Shot Games: The Emergence of Cooperation Through Pregame Signaling}
+\author{William Kilty}
+
+%% This file can be used for creating a wide range of reports
+%%  across various Schools
+%%
+%% Set up some things, mostly for the front page, for your specific document
+%
+% Current options are:
+% [ecs|msor|sms]          Which school you are in.
+%                         (msor option retained for reproducing old data)
+% [bschonscomp|mcompsci]  Which degree you are doing
+%                          You can also specify any other degree by name
+%                          (see below)
+% [font|image]            Use a font or an image for the VUW logo
+%                          The font option will only work on ECS systems
+%
+\usepackage[font,ecs]{vuwproject}
+
+\supervisors{Marcus Frean and Stephen Marsland}
+
+\otherdegree{Bachelor of Science with Honours in Artificial Intelligence}
+
+% Comment this out if you want the date printed.
+% \date{}
+
+\begin{document}
+
+% Make the page numbering roman, until after the contents, etc.
+\frontmatter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{abstract}
+
+  In our daily lives, decision-making processes frequently involve evaluating the trade-offs between personal interests and potential consequences. This is especially prevalent in decisions involving multiple decision-makers. The level of understanding between the individuals involved can significantly impact these decisions. In this paper, we investigate through machine learning the influence of understanding on decision-making within the context of interactions between strangers and individuals with varying degrees of familiarity and influence. We frame decision-making scenarios as one-shot games played between strangers without prior interactions, identifying the limitations in personal gain when dealing with unknown entities. Our study explores how knowledge of opponent behaviours can emerge through a value iterator-driven 'pregame', enabling the development of trust between actors in a digital environment. Focusing on classic game theory dilemmas, such as the Prisoner's Dilemma and the Stag Hunt, we illustrate that, even without a programmed concept of trust, actors learn to mitigate decision-making risks by engaging in a short pregame signalling act. This approach leads to the emergence of cooperation in situations where it would otherwise be considered perilous. Our findings shed light on the significance of knowledge and communication in decision-making and offer valuable insights for the design of rational actors in machine learning models engaged in one-shot game interactions.
+
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitle
+
+\include{acknowledge}
+
+\tableofcontents
+
+% we want a list of the figures we defined
+\listof{fig}{Figures}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\mainmatter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% individual chapters included here
+\include{introduction}
+\include{background}
+\include{methodology}
+\include{implementation}
+\include{results}
+\include{discussion}
+\include{conclusion}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\backmatter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%\bibliographystyle{ieeetr}
+\bibliographystyle{acm}
+\bibliography{refs}
+
+
+\end{document}

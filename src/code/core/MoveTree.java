@@ -35,7 +35,7 @@ public abstract class MoveTree {
 
     TreeNode[][] layers = initTree();
 
-    int xStep = 2 * stateSize;
+    int xStep = (int)(1.5 * stateSize);
     int width  = xStep * (layers.length+1);
     int height = xStep * Stream.of(layers).mapToInt(l->{return l.length;}).max().getAsInt();
 
@@ -185,11 +185,11 @@ public abstract class MoveTree {
   // MOVE GRID //
   //           //
 
-  public static void drawMoveGrid(String filename, double gamma, int stateSize, Class<? extends Actor> actorType) throws Exception {
+  public static void drawMoveGrid(String filename, int stateSize, Class<? extends Actor> actorType, World.VI_MODE viMode) throws Exception {
     World.Setup.setActorType(actorType);
     World.Setup.setNumActors(2);
-    World.Setup.setVIMode(World.VI_MODE_COMP);
-    World.Setup.setGamma(gamma);
+    World.Setup.setVIMode(viMode);
+    World.Setup.setGamma(0.99);
 
     World.Visualiser.setActorRingRadius(0.3);
     World.Visualiser.setActorCircRadius(0.23);
@@ -229,6 +229,20 @@ public abstract class MoveTree {
     FileIO.writeImage(filename, img);
   }
 
+  public static void drawNormalForm(String filename, int size) {
+    World.Visualiser.setActorRingRadius(0.3);
+    World.Visualiser.setActorCircRadius(0.23);
+    World.Visualiser.setOffset45(true);
+
+    World.Setup.initialiseMDPs(); 
+    World.Setup.doVI();
+    
+    BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+    drawGridMDP(img.createGraphics(), size/2, 0, 0);
+
+    FileIO.writeImage("../screenshots/"+filename + (filename.endsWith(".png") ? "" : ".png"), img);
+  }
+
   private static void drawGridMDP(Graphics2D g, int stateSize, int x, int y) {
     for (int i = 0; i < 2; i++) {
       for (int j = 0; j < 2; j++) {
@@ -253,12 +267,12 @@ public abstract class MoveTree {
   }
 
   public static void main(String[] args) throws Exception {
-    drawMoveGrid("StagHunt/screenshots/AllGames_0_NoDiscount.png", 1, 360, OneBoolActor.class);
-    drawMoveGrid("StagHunt/screenshots/AllGames_1_Discount.png", 0.99, 360, OneBoolActor.class);
-    drawMoveGrid("StagHunt/screenshots/AllGames_2_Holds.png", 0.99, 360, TwoBoolActor.class);
+    drawMoveGrid("StagHunt/screenshots/AllGames_0_Nash_Equilibria.png", 360, OneBoolActor.class, World.VI_MODE.Naive);
+    drawMoveGrid("StagHunt/screenshots/AllGames_1_Discount.png", 360, OneBoolActor.class, World.VI_MODE.CVI);
+    drawMoveGrid("StagHunt/screenshots/AllGames_2_Holds.png", 360, TwoBoolActor.class, World.VI_MODE.CVI);
     TwoBoolActor.exitCond = (state, actorNum) -> state.allButMeCond((a) -> !((TwoBoolActor)a).isHolding(), actorNum);
-    drawMoveGrid("StagHunt/screenshots/AllGames_3_StrongHolds.png", 0.99, 360, TwoBoolActor.class);
+    drawMoveGrid("StagHunt/screenshots/AllGames_3_StrongHolds.png", 360, TwoBoolActor.class, World.VI_MODE.CVI);
     TwoBoolActor.exitCond = (state, actorNum) -> state.allButMeCond((a) -> !((TwoBoolActor)a).isHolding(), (actorNum+1)%2);
-    drawMoveGrid("StagHunt/screenshots/AllGames_4_ReducedFreedom.png", 0.99, 360, TwoBoolActor.class);
+    drawMoveGrid("StagHunt/screenshots/AllGames_4_ReducedFreedom.png", 360, TwoBoolActor.class, World.VI_MODE.CVI);
   }
 }

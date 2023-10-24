@@ -1,0 +1,29 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {fig}{\numberline {4.1}{\ignorespaces An example of the interface}}{13}{fig.4.1}%
+\addvspace {10\p@ }
+\contentsline {fig}{\numberline {5.1}{\ignorespaces Item Swap with Naive Value Iteration}}{15}{fig.5.1}%
+\contentsline {fig}{\numberline {5.2}{\ignorespaces Item Swap with Comprehensive Value Iteration - no holds}}{16}{fig.5.2}%
+\contentsline {fig}{\numberline {5.3}{\ignorespaces Item Swap with Comprehensive Value Iteration - with holds}}{16}{fig.5.3}%
+\contentsline {fig}{\numberline {5.4}{\ignorespaces Item Swap with Symmetric Value Iteration - with holds and three actors}}{17}{fig.5.4}%
+\contentsline {fig}{\numberline {5.5}{\ignorespaces Prisoner's Dilemma with Naive Value Iteration in normal form}}{18}{fig.5.5}%
+\contentsline {fig}{\numberline {5.6}{\ignorespaces Prisoner's Dilemma with Comprehensive Value Iteration in normal form}}{18}{fig.5.6}%
+\contentsline {fig}{\numberline {5.7}{\ignorespaces Prisoner's Dilemma with Comprehensive Value Iteration starting with defection}}{19}{fig.5.7}%
+\contentsline {fig}{\numberline {5.8}{\ignorespaces Prisoner's Dilemma with Comprehensive Value Iteration starting with cooperation}}{19}{fig.5.8}%
+\contentsline {fig}{\numberline {5.9}{\ignorespaces Prisoner's Dilemma with Comprehensive Value Iteration in normal form with holds enabled}}{19}{fig.5.9}%
+\contentsline {fig}{\numberline {5.10}{\ignorespaces Prisoner's Dilemma with Comprehensive Value Iteration starting with defection and holds enabled}}{20}{fig.5.10}%
+\contentsline {fig}{\numberline {5.11}{\ignorespaces Prisoner's Dilemma with Comprehensive Value Iteration starting with cooperation and holds enabled}}{20}{fig.5.11}%
+\contentsline {fig}{\numberline {5.12}{\ignorespaces Prisoner's Dilemma with Comprehensive Value Iteration starting with cooperation and holds enabled - 3 actors}}{21}{fig.5.12}%
+\contentsline {fig}{\numberline {5.13}{\ignorespaces Prisoner's Dilemma with Comprehensive Value Iteration starting with cooperation and holds enabled - 4 actors}}{21}{fig.5.13}%
+\contentsline {fig}{\numberline {5.14}{\ignorespaces Stag Hunt with Naive Value Iteration in normal form, showing both Nash Equilibria as viable options}}{22}{fig.5.14}%
+\contentsline {fig}{\numberline {5.15}{\ignorespaces Stag Hunt with Comprehensive Value Iteration in normal form, showing stag hunting as the only chosen exit-point}}{22}{fig.5.15}%
+\contentsline {fig}{\numberline {5.16}{\ignorespaces Stag Hunt with Comprehensive Value Iteration. Extensive form showing the process of agreeing to hunt a stag}}{22}{fig.5.16}%
+\contentsline {fig}{\numberline {5.17}{\ignorespaces Stag Hunt with Comprehensive Value Iteration. Extensive form showing the process of agreeing to hunt a stag with 5 actors}}{23}{fig.5.17}%
+\contentsline {fig}{\numberline {5.18}{\ignorespaces All 2x2 Ordinal Games. Nash equilibria in green. Personal optima in actor colours.}}{24}{fig.5.18}%
+\contentsline {fig}{\numberline {5.19}{\ignorespaces All 2x2 Ordinal Games under CVI. Cooperative solutions in green. Personal optima in actor colours.}}{25}{fig.5.19}%
+\contentsline {fig}{\numberline {5.20}{\ignorespaces All 2x2 Ordinal Games under CVI with holds. Cooperative solutions in green. Personal optima in actor colours.}}{26}{fig.5.20}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }

@@ -93,6 +93,10 @@ abstract class Controls {
           MoveTree.drawMoveTree("tree_from_"+Integer.toBinaryString(State.Encoder.encode(World.Player.getState())), 480);
           return;
         }
+        if (keyCode == KeyEvent.VK_F3) {
+          MoveTree.drawNormalForm("normal_form_"+World.Setup.getActorType().getSimpleName(), 480);
+          return;
+        }
         if (keyCode == KeyEvent.VK_F11) {
           Core.WINDOW.toggleFullscreen();
           return;

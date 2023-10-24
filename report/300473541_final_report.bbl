@@ -1,0 +1,71 @@
+\begin{thebibliography}{10}
+
+\bibitem{altman2006learning}
+{\sc Altman, A., Bercovici-Boden, A., and Tennenholtz, M.}
+\newblock Learning in one-shot strategic form games.
+\newblock In {\em Machine Learning: ECML 2006: 17th European Conference on
+  Machine Learning Berlin, Germany, September 18-22, 2006 Proceedings 17\/}
+  (2006), Springer, pp.~6--17.
+
+\bibitem{aumann1990nash}
+{\sc Aumann, R.}
+\newblock Nash equilibria are not self-enforcing.
+\newblock {\em Economic decision making: Games, econometrics and
+  optimisation\/} (1990), 201--206.
+
+\bibitem{Bel}
+{\sc Bellman, R.}
+\newblock A markovian decision process.
+\newblock {\em Indiana Univ. Math. J. 6\/} (1957), 679--684.
+
+\bibitem{burnett2010bootstrapping}
+{\sc Burnett, C., Norman, T.~J., and Sycara, K.}
+\newblock Bootstrapping trust evaluations through stereotypes.
+\newblock In {\em Proceedings of the 9th International Conference on Autonomous
+  Agents and Multiagent Systems (AAMAS 2010)\/} (2010), International
+  Foundation for Autonomous Agents and Multiagent Systems.
+
+\bibitem{djiguemde2022continuous}
+{\sc Djiguemde, M., Dubois, D., Sauquet, A., and Tidball, M.}
+\newblock Continuous versus discrete time in dynamic common pool resource game
+  experiments.
+\newblock {\em Environmental and Resource Economics 82}, 4 (2022), 985--1014.
+
+\bibitem{fischer2011bystander}
+{\sc Fischer, P., Krueger, J.~I., Greitemeyer, T., Vogrincic, C.,
+  Kastenm{\"u}ller, A., Frey, D., Heene, M., Wicher, M., and Kainbacher, M.}
+\newblock The bystander-effect: a meta-analytic review on bystander
+  intervention in dangerous and non-dangerous emergencies.
+\newblock {\em Psychological bulletin 137}, 4 (2011), 517.
+
+\bibitem{frean2022holds}
+{\sc Frean, M., and Marsland, S.}
+\newblock Holds enable one-shot reciprocal exchange.
+\newblock {\em Proceedings of the Royal Society B 289}, 1980 (2022), 20220723.
+
+\bibitem{fudenberg1991game}
+{\sc Fudenberg, D., and Tirole, J.}
+\newblock {\em Game theory}.
+\newblock MIT press, 1991.
+
+\bibitem{kochenderfer2022algorithms}
+{\sc Kochenderfer, M.~J., et~al.}
+\newblock {\em Algorithms For Decision Making}.
+\newblock MIT press, 2022.
+
+\bibitem{osborne2004introduction}
+{\sc Osborne, M.~J., et~al.}
+\newblock {\em An introduction to game theory}, vol.~3.
+\newblock Oxford University Press New York, 2004.
+
+\bibitem{owen2013game}
+{\sc Owen, G.}
+\newblock {\em Game theory}.
+\newblock Emerald Group Publishing, 2013.
+
+\bibitem{StagHunt}
+{\sc Skyrms, B.}
+\newblock {\em The Stag Hunt and The Evolution of Social Structure}.
+\newblock Cambridge University Press, 2004.
+
+\end{thebibliography}

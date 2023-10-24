@@ -1,0 +1,59 @@
+\chapter{Implementation}\label{C:imp}
+
+\section{Phase One: Value Iterator}
+
+To create the artefact, we first need a working value iterator. In its first design, this took the form of a basic one-actor Iterator with Bellman equation $Q$ and $V$ calculations running in a loop for as many iterations as specified by the user. To fuel this, an MDP with precalculated $\gamma$ value, number of states and actions, $T$ matrix, and $R$ matrix is supplied to the Iterator. After ensuring the system was working, and that a single-person Stag Hunt did indeed value hunting a stag for a bigger reward over hunting a hare for a lesser reward, we moved on to phase two, where we designed a system to allow for easy definition of a game - rather than requiring precalculated values.
+
+\section{Phase Two: OOMDP}
+
+This system would be deemed the Object-Oriented-Markov-Decision-Process (OOMDP). This system takes advantage of the object-oriented nature of Java, the language used to create the artefact for this very purpose. Rather than taking a precalculated transition and reward matrix, this system would devise them automatically. To do this we create individual Actor objects, give them a set of $boolean$ values and a set of actions $A$ to perform to alter these values, and deem any unique combination of the $boolean$ values a state $s \in S$. 
+
+To save memory within the program an actor can be represented as an integer in binary form, with bits representing its values - e.g. $01$ for an actor with two values, one set to $True$ and one set to $False$. $s$ can likewise be represented in this form - a joining of each of its actors' binary representations into a single integer - e.g. $10001101$ for a game with four actors each with two values. This optimisation allows us to store an entire state - with all its complex rules and actors - into a single integer. A final state is needed - represented by a single bit of order one larger than its component actors make use of - the exit state. Because of the choice of ordering with these encoded state representations, we are able to find every state combination purely from this exit state. If one iterates through all the integers up to and including the encoded representation of the exit state, one will find they have explored every state in the game.
+
+A reward matrix $R$ is a three-dimensional array of rewards given for the act of starting in a state $s$, performing an action $a$, and ending up in a state $s'$. The transition matrix $T$ is, likewise, a three-dimensional array containing probabilities that performing $a$ from $s$ results in $s'$. To generate these matrices, one needs to attempt all the actions in $A$ from all the states in $S$ to observe where in $S$, $s'$ is. 
+
+An OOMDP must be created for every actor, as it is the result of actions being performed by a single actor $x$ and their associated probabilities and rewards. For instance, if $x$ performs action $a$ and the result is the toggling of bit $x_i$, this is a result unique to $x$. If actor $y$ performs that same action $a$, they will not toggle $x_i$, but rather $y_i$. 
+
+An observed $s$-$a$-$s'$ combination has its $T$ value set to 1 (0 otherwise), and its $R$ value set to the result of a predefined function taking into account the state of the underlying actors and their relation to the specified target actor. An example of this reward function for the Stag Hunt in this version of the program should make things clearer.
+
+\[huntStag ? state.allActorsCond((a) -> a.huntStag) ? 4 : 0 : 3;\]
+
+Upon reaching the exit state, this reward function activates, giving a reward of 3 if a hare is being hunted, a reward of 0 if not all actors are hunting the stag, and a reward of 4 if everyone is hunting a stag together. This is the reward of a single actor upon reaching the exit state and will be assigned to $R$ in the initialisation of that actor's OOMDP.
+
+Once calculated, the OOMDP functions identically to the classical MDP. The state and actor objects are no longer needed, and the value iterator defined previously can accept it as such. If we declare a single Stag Hunt actor and generate its OOMDP and perform value iteration on it, we end up with the same result as when the MDP was precalculated. However, when we define two actors, we end up with two Nash Equilibria - two states in which the actors will gravitate towards and then leave from. This follows the theory on the Stag Hunt where if both are cooperative they will hunt a stag, but if one is defecting the other will also defect \cite{StagHunt}. This is not our desired result - where the actors should learn to escape from suboptimal Nash Equilibria - and as such we need to explore the problem deeper.
+
+\section{Interface}\label{interface}
+
+As a short aside, purely looking at the printed output of the $Q$ and $V$ tables is not as informative as is preferable, and so I implemented a custom interactive interface with which to explore the game and its strategy as devised by the value iterator. To do this, I used Java Swing to provide a single JFrame - a window - with which we can draw directly onto. From this, a new Graphical User Interface (GUI) library is built which displays custom buttons on this screen that can be interacted with using the mouse or keyboard input.
+
+In addition, I created visualisations of states - a ring, with the actors spaced evenly across, coloured by discrete steps in hue to separate the actors visually as clearly as possible. A character may be displayed atop an actor, representing its current values or simply as an identifier, depending on the use case. I wanted this system to be as malleable as possible when designing it, so any number of actors may be displayed, with any given visualisation of data within them. 
+
+Once a strategy has been found through value iteration, the actors can be interacted with to either play their best move according to the strategy or the user can 'play' as one of the actors to see how other actors react to a non-rational counterpart. This allows for a much greater understanding of the strategy developed and allows a user to learn the nuances of the observed game. Fig \ref{uiimage} shows an example of this interface for the Stag Hunt problem.
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=10cm]{../screenshots/UI.png}}
+    \caption{An example of the interface}\medskip\label{uiimage}
+  \end{minipage}
+\end{fig}
+
+\section{Phase 3: Holds}
+
+In order to find a variant of our pregame system that allows for actors to learn to cooperate and escape from the suboptimal Equilibria, we implement the concept of 'holds'. This is the concept devised by Frean and Marsland \cite{frean2022holds} to enable convergence between their two actors in the game of Swapping. The idea is that an actor can hold the actor to its left - around the ring, as discussed in section \ref{interface} - to restrict the ability for both to 'leave'. This inclusion should remove any risk of being 'left' while an actor makes any risky moves towards a more optimal equilibrium in hopes that the other follows. An actor can hold its counterpart, switch to the desired strategy, and not release the hold until the other follows suit.
+
+\section{Comprehensive Value Iteration}
+
+Another vital element implemented within the engine was the development of Comprehensive value iteration (CVI). A limitation of standard value iteration is that values not influenced directly by actions within the OOMDP are assumed static. This assumption is problematic, as other actors within the game can - and likely will - alter these values. Rather than treating a value not directly controlled by the target actor as a fixed point to work around, we should instead attempt to predict the strategies of the other actors in the game and incorporate their strategies into our own. This is a concept discussed more generally through theoretical game theory by Fudenberg et al. in their 1991 book on game theory \cite{fudenberg1991game}.
+
+CVI was implemented by altering OOMDPs to take in both the actor performing the actions $x$, and the actor receiving the rewards $y$ separately. When value iteration is performed, rather than taking in a single MDP for the actor, we take in an MDP for every actor as the target of every other actor's actions. After performing a set of $Q$ steps for each actor, we can determine what $a$ they each prefer for each $s$. This allows us, in the next step, to take the average of the valuation of all these 'best' $s,a$ pairs to our target actor as the valuation for its next $Q$ step. This way, if a state may allow $x$ to achieve its best reward, but from that same state $y$ is likely to incidentally give $x$ its worst reward, $x$ no longer naively assumes that it is guaranteed its best reward, and instead values the state as the average of these best and worst rewards.
+
+\section{Symmetric Value Iteration}
+
+A significant problem with CVI is that the computational and memory complexity balloons from $O(1)$ for the number of actors to $O(X^2)$. This puts a hard limit of $~3$ actors for a game of even moderate complexity. Whilst this allows us to perform non-symmetric games within the engine, Swapping, PD, and SH are all examples of symmetric games. To better explore these games, it is worth introducing another assumption to reduce this complexity. This assumption is that of symmetry, leading to the development of Symmetric Value Iteration (SVI).
+
+SVI allows us to treat each target actor as identical. If actor $x$ sees the state $01$, in a game with two actors each of size 1, it will react the same way as actor $y$ who sees the state $10$. Note that this is not each actor acting the same in the \textit{same} state - it is each actor acting the same in the \textit{equivalent} state. To implement this, we only need an OOMDP for each actor acting against a single target actor. We are then able, after each $Q$, $V$ step, to rotate the values for each state to their equivalent state for each of the actors, and simulate the effects of CVI without needing to repeat calculations unnecessarily. This is correct as long as we expect our actors to behave in the same way as one another - i.e. in a symmetric game. This state rotation is done through the line of code:
+
+\[state = (state >> actorSize) | ((state \& ((1<<actorSize)-1)) << (stateSize-actorSize));\]
+
+This code uses bit manipulation to rotate the binary representation of a state by an actor, to reflect the equivalent state for the actor one space to the left. This process can be repeated to obtain an equivalent state for any given actor within a game.

@@ -1,0 +1,205 @@
+\chapter{Results}\label{C:res}
+
+Before beginning our foray into the results of the artefact, we must first discuss the meaning of the plots that will be shown. The primary output we will analyse is a representation of the pregame in what is called Extensive Form \cite{fudenberg1991game}. This is a decision tree-style output showing the progression from state to state until the conclusion of the game is reached - our actors decide to exit the scenario and enact the one-shot game. These plots are coloured through a specific colour scheme. A blue node in the tree is the start-point of a pregame. A grey node is a standard transition node of no key significance. A green node is one in which both actors agree to begin the one-shot. A yellow node is one in which at least one of the actors will decide to leave if given the chance. Each node forks into the outcomes of each actor playing its best-determined move from the state belonging to the node.
+
+The other key visualisation of game output is Normal Form \cite{fudenberg1991game}. This shows the scores obtained by each actor for each state in a one-shot game in the form of a matrix. This is useful for displaying all the possible outcomes of a game, though it is cumbersome for more complex games or games with more than two players. A similar colour scheme is chosen for this representation. A grey tile is a state in which neither actor will choose this outcome through a pregame. A green tile is a state in which both actors will select this outcome if it were to occur during the pregame. A blue tile is one in which the blue player will choose should it occur in the pregame, and conversely, a red tile is one in which the red player favours.
+
+\section{Recreating Swaps}
+
+First, we recreate the Item Swap game proposed by Frean and Marsland \cite{frean2022holds} in a bid to show that the system works as intended. With standard value iteration, we obtain the extensive form tree as seen in fig \ref{ISNVI}.
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=7cm]{../screenshots/item_swap_Naive.png}}
+    \caption{Item Swap with Naive Value Iteration}\medskip\label{ISNVI}
+  \end{minipage}
+\end{fig}
+
+Unsurprisingly, standard VI does not enable actors enough communicative knowledge to enact a successful swap, and both actors elect to keep hold of their beginning items. Adding CVI to the scenario with no affordances of any kind gives us fig \ref{ISCVINH}. This is still insufficient for a successful swap, though this is promising news as without affordances, Frean and Marsland were also unable to achieve a swap. It is only with the advent of some form of hold that a 'swap dance' is obtained. This can be seen through fig \ref{ISCVI}. Because this is a symmetric game, we unsurprisingly end up with a symmetric ‘swap dance’. Either one of the actors $x$ takes hold of the remaining actor $y$’s item, thus locking the pair into the interaction. From here $x$ is willing to release its own item and $y$ is willing to take hold of $x$’s item in any order. Once $y$ is in possession of $x$’s item, it will spend its next turn releasing its own item, thus releasing the lock between the two, and they may separate having successfully swapped.
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=7cm]{../screenshots/item_swap_CVI_no_holds.png}}
+    \caption{Item Swap with Comprehensive Value Iteration - no holds}\medskip\label{ISCVINH}
+  \end{minipage}
+\end{fig}
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=18cm]{../screenshots/item_swap_CVI_holds.png}}
+    \caption{Item Swap with Comprehensive Value Iteration - with holds}\medskip\label{ISCVI}
+  \end{minipage}
+\end{fig}
+
+We have shown here that under the same circumstances as Frean and Marsland's solution, we receive the same results. This validation ensures the model is working as intended, and we are able to experiment further. Namely, to try performing a swap between three actors. To make this scenario work with more than two actors, we must establish which items are being swapped. An actor may hold either its own item or the item belonging to the actor to its right. Holding another actor refers to holding the actor to its left. This way an actor can specifically stop another from taking its own item should it have the need.
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=15cm]{../screenshots/item_swap_SVI_holds_3.png}}
+    \caption{Item Swap with Symmetric Value Iteration - with holds and three actors}\medskip\label{ISSVI3}
+  \end{minipage}
+\end{fig}
+
+Running this experiment with three actors - fig \ref{ISSVI3} - provides a tree with three-way symmetry. The dance is vastly more complicated with three than with two. However, there are some interesting specific observations to be made from it. Perhaps most notable is the occurrence of yellow nodes in the network. Like the two-actor swap, we have a single green node in which the actors have all successfully swapped, but in order to reach this node, the actors must traverse one of three yellow points - points where one of the three actors will decide to leave, having already obtained its desired item and no restriction on its exit. This is unfortunately unavoidable in this scenario as actors are not able to restrict the exits of all participants on their own, and a restricted exit must be decomposed over multiple moves. 
+
+The other phenomenon present here is that while all holds were available in the two-actor swap, holding another actor directly was not utilised. For the swap dance to complete in the three-actor case, all types of holds are utilised to ensure risk is eliminated. This implies that performing a swap between more people introduces more risk. The reason for this can be observed within fig \ref{ISSVI3} where before releasing hold of their own item, an actor $x$ will always take hold of the left actor $y$. This is to stop $y$ from releasing its own item and making off with $x$'s before $x$ has obtained sole possession of its desired item.
+
+\section{Prisoner's Dilemma}\label{sec:PDres}
+
+Moving on from item swapping, we explore the effects of a pregame on the Prisoner's Dilemma. Starting with standard VI, we observe results in normal form in fig \ref{PDNVI}. This shows the dilemma as we hypothesised in section \ref{sec:1shot}, with one Nash Equilibrium at $d,d$, and opportunistic choices for each at $c,d$ and $d,c$. The actors will never agree to cooperate, for they could always hypothetically obtain a better score by defecting.
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=3cm]{../screenshots/pd_nf_NVI.png}}
+    \caption{Prisoner's Dilemma with Naive Value Iteration in normal form}\medskip\label{PDNVI}
+  \end{minipage}
+\end{fig}
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=3cm]{../screenshots/pd_nf_CVI_no_holds.png}}
+    \caption{Prisoner's Dilemma with Comprehensive Value Iteration in normal form}\medskip\label{PDCVI}
+  \end{minipage}
+\end{fig}
+
+When we introduce CVI/SVI (the two are interchangeable for symmetric games such as this), the actors suddenly agree to cooperate. This is seen in fig \ref{PDCVI}. However, it has not removed the opportunistic choices or the defect space as solutions. This can be seen across figs \ref{PDCVIDD} and \ref{PDCVICC} where we have the pregame in extensive form. The actors in both cases simply leave immediately. To leave from $d,d$ as a starting space, one needs to cooperate. This cooperative signalling, however, provides the other actor an opportunity to defect under the knowledge that it will now get the ideal payout. This means the two will simply agree to take the suboptimal $d,d$ payout. Conversely, they now realise that from $c,c$ they can risk the better reward of $d,c$ by changing and hoping for a chance to act before their opponent, though if their opponent acts first the pair get stuck once more in $d,d$. The risk is deemed too high, so the pair agree to cooperate instead.
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=7cm]{../screenshots/pddd_CVI_no_holds.png}}
+    \caption{Prisoner's Dilemma with Comprehensive Value Iteration starting with defection}\medskip\label{PDCVIDD}
+  \end{minipage}
+\end{fig}
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=7cm]{../screenshots/pdcc_CVI_no_holds.png}}
+    \caption{Prisoner's Dilemma with Comprehensive Value Iteration starting with cooperation}\medskip\label{PDCVICC}
+  \end{minipage}
+\end{fig}
+
+If we enable holds for the pair, we get a new range of results. The normal form can be seen in fig \ref{PDCVIhold} whereas extensive forms starting from $d,d$ and $c,c$ can be found in figs \ref{PDCVIDDhold} and \ref{PDCVICChold} respectively.
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=3cm]{../screenshots/pd_nf_CVI_holds.png}}
+    \caption{Prisoner's Dilemma with Comprehensive Value Iteration in normal form with holds enabled}\medskip\label{PDCVIhold}
+  \end{minipage}
+\end{fig}
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=15cm]{../screenshots/pddd_CVI_holds.png}}
+    \caption{Prisoner's Dilemma with Comprehensive Value Iteration starting with defection and holds enabled}\medskip\label{PDCVIDDhold}
+  \end{minipage}
+\end{fig}
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=15cm]{../screenshots/pdcc_CVI_holds.png}}
+    \caption{Prisoner's Dilemma with Comprehensive Value Iteration starting with cooperation and holds enabled}\medskip\label{PDCVICChold}
+  \end{minipage}
+\end{fig}
+
+Interestingly, while holds enable a swap dance to function, they appear to completely break the Prisoner's Dilemma. Despite superficial similarities between Item Swap and Prisoner's Dilemma, the games appear to have a key difference. We shall discuss this in greater depth later. For now, we observe that holds have removed the option to exit through any path other than the greedy maximum. The actors will neither cooperate nor compromise for the split sentence. When starting from $c,c$, the first to act will have the opportunity to defect and betray the other. However, should their opponent take a turn, a hold will take place and the pair will never let go of one another. From the other start point - $d,d$ - the pair will simply take hold and never let go, with no chance of exit at any point. A pregame with holds in place will result in a stalemate almost every single time.
+
+Once we increase the number of actors beyond two, the actors will ignore the holds entirely, instead opting to make their way towards the total defect strategy, allowing chances for individual opportunity along the way. This can be seen for three actors and four actors in figs \ref{PDCVI3} and \ref{PDCVI4}. Ignoring holds is simply because actor $x$ holding actor $y$ leaves actor $z$ free to defect and leave while $x$ and $y$ are stuck in their hold. Moving towards the all-defect state is likely due to the increased opportunity to take a greedy result. When defecting, the blame is put solely on those who are deciding to cooperate. For all actors to defect, there are a minimum of as many turns as there are actors to switch to defecting from all cooperating. This provides the first moving actor with $|P|-1$ opportunities to have another turn and leave without punishment. With two actors, this is a big risk, giving a 50\% chance of ending up in $d,d$. But with three actors the chance is only 33\%. The actors deem the risk worthwhile and refuse to cooperate.
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=10cm]{../screenshots/pdcc_CVI_holds_3.png}}
+    \caption{Prisoner's Dilemma with Comprehensive Value Iteration starting with cooperation and holds enabled - 3 actors}\medskip\label{PDCVI3}
+  \end{minipage}
+\end{fig}
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=10cm]{../screenshots/pdcc_CVI_holds_4.png}}
+    \caption{Prisoner's Dilemma with Comprehensive Value Iteration starting with cooperation and holds enabled - 4 actors}\medskip\label{PDCVI4}
+  \end{minipage}
+\end{fig}
+
+\section{The Stag Hunt}
+For the Stag Hunt, running a standard value iterator gives us what we predicted in section \ref{sec:1shot} as seen in fig \ref{SHNVI}: a set of two Nash Equilibria; one for hunting stag as a pair; and one for both hunting hares. Upon introducing CVI, we have successfully eliminated $h,h$ as an exit point. The actors will now elect to cooperate in any situation. This can be seen in the normal form - fig \ref{SHNFCVI} - and through the extensive form - fig \ref{SHCVI}.
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=3cm]{../screenshots/stag_hunt_nf_NVI.png}}
+    \caption{Stag Hunt with Naive Value Iteration in normal form, showing both Nash Equilibria as viable options}\medskip\label{SHNVI}
+  \end{minipage}
+\end{fig}
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=3cm]{../screenshots/stag_hunt_nf_CVI.png}}
+    \caption{Stag Hunt with Comprehensive Value Iteration in normal form, showing stag hunting as the only chosen exit-point}\medskip\label{SHNFCVI}
+  \end{minipage}
+\end{fig}
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=12cm]{../screenshots/stag_hunt_CVI.png}}
+    \caption{Stag Hunt with Comprehensive Value Iteration. Extensive form showing the process of agreeing to hunt a stag}\medskip\label{SHCVI}
+  \end{minipage}
+\end{fig}
+
+If we add holds to the scenario, we receive the same plots. The actors do not need to restrict the ability of their opponent to leave to remove the risk of switching from defecting to cooperating. Simply the ability to signal effectively to one another, alongside the knowledge of what the other actor's preferences are, provides enough information for the actors to trust one another. This is reinforced by Robert Aumann in his 1990 paper 'Nash equilibria are not self-enforcing' \cite{aumann1990nash} in which he states 'In the games of [Stag Hunting], each player \textit{always} prefers the other to play $c$, no matter what he himself plays. Therefore an agreement to play ($c,c$) conveys no information about what the players will do.' [pg.620] This means that if the actors understand the preferences of one another, they will both deduce that they both want to play $c$, and any interaction therein is ultimately unnecessary. It is the understanding of one another's preferences provided by CVI that allows an optimal Stag Hunt to occur.
+
+Further, if we increase the number of actors in the scenario, we get the same results. This can be seen in the game of five actors in fig \ref{SHCVI5}. The posturing takes longer as more actors need to take turns to signal a preference for stag hunting, but assuming all actors hold a preference for stag over hare, the stag hunt takes place.
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=11cm]{../screenshots/stag_hunt_CVI_5.png}}
+    \caption{Stag Hunt with Comprehensive Value Iteration. Extensive form showing the process of agreeing to hunt a stag with 5 actors}\medskip\label{SHCVI5}
+  \end{minipage}
+\end{fig}
+\section{All 2x2 Ordinal Games}
+
+Finally, we broaden our sights to the scope of all one-shot games. There are a total of 144 unique ordinal two-actor games where each actor has a single action. This encompasses both the Stag Hunt and the Prisoner's Dilemma as well as a number of other famous games such as 'Chicken' and 'Battle of the Sexes'. These games are obtained by taking all the non-rotational permutations of two actors with four different state preferences: $3! \cdot 4!=144$.
+
+These games are arranged in a grid, containing all the games in their normal form representations. To begin with, we show all the Nash Equilibria and personal optima in fig \ref{AGN}. Each 2x2 subgrid represents all the exit states of a game in normal form. The number within an actor represents the reward given to that actor playing that strategy. As these are ordinal games, the specific number itself is not significant, merely the order of preference $4>3>2>1$.
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=16cm]{../screenshots/AllGames_0_Nash_Equilibria.png}}
+    \caption{All 2x2 Ordinal Games. Nash equilibria in green. Personal optima in actor colours.}\medskip\label{AGN}
+  \end{minipage}
+\end{fig}
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=16.5cm]{../screenshots/AllGames_1_Discount_greyed.png}}
+    \caption{All 2x2 Ordinal Games under CVI. Cooperative solutions in green. Personal optima in actor colours.}\medskip\label{AGC}
+  \end{minipage}
+\end{fig}
+
+Following this, fig \ref{AGC} shows all games under the influence of CVI - allowing actors to communicate and understand one another's motivations. We have eliminated games that show no change under this addition. From this, it can be observed that the vast majority (~86\%) of games are altered through prior communication without affordances. The only games that are not affected are those that have goals so closely aligned as to make communication unnecessary and those that have goals so opposed that no cooperation is possible. Any game in which forward-thinking or some form of compromise is possible is improved through the addition of prior communication. Actors can escape from both suboptimal Nash Equilibria and suboptimal greedy solutions.
+
+\begin{fig}[H]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \centerline{\includegraphics[width=16.5cm]{../screenshots/AllGames_2_Holds_greyed.png}}
+    \caption{All 2x2 Ordinal Games under CVI with holds. Cooperative solutions in green. Personal optima in actor colours.}\medskip\label{AGH}
+  \end{minipage}
+\end{fig}
+
+After introducing holds to the set of games - fig \ref{AGH} - we eliminate all but seven of the total set - when compared to CVI. Holds generally do not influence the turnout of games when allowed within pregames. It appears that holds have an effect only when an opponent can be 'guided' towards an alternative solution that though slightly worse for the opponent, isn't enough of a detriment for the opponent to care. The only exception to this is the Prisoner's Dilemma, in which the game breaks down into a stalemate, as discussed in section \ref{sec:PDres}. Interestingly, no other game matches the Prisoner's Dilemma in this way; where compromise is encouraged until the actors have direct influence over one another. This is not to say that holds remove compromise either - it is shown through item swapping that holds allow for a compromise that isn't possible without it, and many games still show compromise equilibria with holds enabled.

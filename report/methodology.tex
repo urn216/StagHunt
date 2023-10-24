@@ -1,0 +1,27 @@
+\chapter{Methodology}\label{C:met}
+
+Through our model we will explore a recreation of Frean and Marsland's \cite{frean2022holds} Item Swap game. This will validate our system against an existing method, thereby providing confidence that this artefact works as intended. We will also explore the Prisoner's Dilemma, both as an interesting problem with no optimal Nash Equilibrium and to investigate whether the potential relationship between itself and the Item Swap is anything more than superficial. Another game of interest worth exploring is the Stag Hunt. This game, as discussed in section \ref{sec:1shot} has two Nash Equilibria. Pre-game posturing may just provide a means to avoid the suboptimal equilibrium in favour of hunting a stag. Finally, we will broaden our horizons and explore the effects of the pregame on all 2x2 ordinal one-shot games to better see the effects of communication across a variety of situations.
+
+\section{The problem with Value Iteration}
+
+Value iteration and the games we will be looking at have a key difference that makes them incompatible. Value iteration in its purest form is only applicable to one-actor scenarios. If we take a moment to examine the process of value iteration more closely, this limitation should make itself clear.
+
+Value Iterators see a representation of their environment as an MDP. An MDP, as discussed in \ref{sec:VIintro}, contains a set of states $S$, a set of possible actions $A$, a transition matrix $T$, and a reward matrix $R$. It is within $A$ that the issue arises. If we take $A$ as the set of all actions performable by all actors in the game, the value iterator will perform the action with the highest reward, regardless of the actor acting. In this scenario, $R$ must either take some global fitness score - at odds with the very basis of competitive games - or apply to a specific actor - in which case this actor is learning to play moves as another if it so benefits.
+
+$A$ must therefore contain the actions of a single actor $p \in P$ where $P$ is the set of both actors. This establishes the need for actor-specific MDPs, denoted MDP($p$). Following this revelation, we require actor-specific value iterators to learn the strategy of a given actor $p$ from their respective MDP($p$). This, however, has its own complications. 
+
+The two value iterators are independent of one another. For two actors $p$ and $q$, the values changed by $p$'s value iterator - the actions in the action set of MDP($p$) - are assumed static by $q$'s Iterator. This means that when developing the policy for actor $q$, $\pi_q$, we are assuming that it is impossible for actor $p$ to ever perform an action in its action set.\footnote{An interesting note here, the value iterators in this situation will find any Nash Equilibria within a game! Refer to \ref{sec:1shot} for the definition of a Nash Equilibrium to see why.} This assumption is clearly incorrect, as both actors will be performing actions within the pregame.
+
+\section{Comprehensive Value Iteration}
+
+To solve this issue, I developed a technique dubbed Comprehensive Value Iteration (CVI). CVI takes a separate MDP for each actor performing actions $p$, against each actor as the 'recipient' of the rewards $q$. The calculated $Q_q$ values are then denoted $Q_{p,q}$ for some $p \in P$. Our $V_q$ values are then calculated as such:
+
+\[V_{q}\left(s\right)=\frac{\sum_{p\ \in\ P}^{ }Q_{p,q}\left(s,\max_{a}\left(Q_{p,p}\right)\right)}{\left|P\right|}\]
+
+This ensures that rather than assuming values that actor $q$ has no control over are static, we take the value of a state $s$ as the average of the resulting reward of each actor performing its own desired action from that state $\max_{a}\left(Q_{p,p}\right)$. This way we can acknowledge the possibility of values outside of $q$'s control changing with equal weight to the values $q$'s own action action-set allows.
+
+With this dynamic system in place, the decision to limit to the standard two-actor versions of these games becomes arbitrary. In theory, we could introduce any number of actors into these scenarios as we like. However, we are limited by the computation power of the device this system is run on. In this chapter, we have grown the computational and memory complexity of the system with respect to the number of actors from $O(1)$ to $O(\left|P\right|^{2})$. In order to take advantage of any system with a large number of actors, we need a simplification of CVI.
+
+\section{Symmetric Value Iteration}
+
+Another system I developed is Symmetric Value Iteration (SVI). This is a simplification of CVI, where we build in an assumption of use within a symmetric game. This allows us to build a single $\pi$ for one actor $q$, and reuse it for each of the others. This still requires the CVI calculations for $Q_{p,q}$, $\forall p \in P$, but rather than a complexity of $O(\left|P\right|^{2})$, we have $O(\left|P\right|)$ - a linear scale rather than quadratic. This is a drastic improvement and allows use in symmetric games with arbitrarily large actor counts without any loss in mathematical accuracy.

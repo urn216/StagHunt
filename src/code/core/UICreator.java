@@ -23,7 +23,6 @@ import code.world.actors.ItemSwapper;
 import code.world.actors.StagHunter;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Shape;
@@ -47,12 +46,12 @@ public class UICreator {
     UIElement.TRANSITION_SLIDE_UP_LEFT
     ){
       protected void init() {components = new UIComponent[]{new UIText("Stag Hunt", 0.6, Font.BOLD)};}
-      protected void draw(Graphics2D g, int screenSizeY, Vector2 tL, Vector2 bR, Color[] c, UIInteractable highlighted) {
-        components[0].draw(g, (float)tL.x, (float)tL.y, (float)(bR.x-tL.x), (float)(bR.y-tL.y), c[UIColours.TEXT]);
+      protected void draw(Graphics2D g, int screenSizeY, Vector2 tL, Vector2 bR, UIColours.ColourSet c) {
+        components[0].draw(g, (float)tL.x, (float)tL.y, (float)(bR.x-tL.x), (float)(bR.y-tL.y), c);
       }
     };
     
-    UIElement outPanel = new ElemList(
+    UIElement outPanel = new ElemListVert(
     new Vector2(0   , 0.28),
     new Vector2(0.11, 0.28+UIHelp.calculateListHeightDefault(2, BUFFER_HEIGHT, COMPON_HEIGHT)),
     COMPON_HEIGHT,
@@ -64,7 +63,7 @@ public class UICreator {
     UIElement.TRANSITION_SLIDE_LEFT
     );
     
-    UIElement newGame = new ElemList(
+    UIElement newGame = new ElemListVert(
     new Vector2(0   , 0.28),
     new Vector2(0.11, 0.28+UIHelp.calculateListHeight(BUFFER_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT*2, COMPON_HEIGHT*2, COMPON_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT, COMPON_HEIGHT)),
     COMPON_HEIGHT,
@@ -86,25 +85,28 @@ public class UICreator {
         1, 
         10
       ),
-      new UIDropDown("VI Mode: %s", 
-        new UIDropDown.Option("Individual", () -> World.Setup.setVIMode(World.VI_MODE_DUMB)), 
-        new UIDropDown.Option("Comprehensive", () -> World.Setup.setVIMode(World.VI_MODE_COMP)),
-        new UIDropDown.Option("Symmetrical", () -> World.Setup.setVIMode(World.VI_MODE_SYMM))
+      new UIDropDown<World.VI_MODE>("VI Mode: %s", 
+        World.Setup::getVIMode,
+        World.Setup::setVIMode,
+        World.VI_MODE.Naive,
+        World.VI_MODE.CVI,
+        World.VI_MODE.SVI
       ),
-      new UIDropDown("MDP Mode: %s", 
-        new UIDropDown.Option("Final Reward", () -> World.Setup.setVIMode(World.VI_MODE_DUMB)), 
-        new UIDropDown.Option("Step Rewards", () -> World.Setup.setVIMode(World.VI_MODE_COMP))
-      ),
-      new UIDropDown("Game: %s",
-        new UIDropDown.Option("Stag Hunt", ()->World.Setup.setActorType(StagHunter.class)),
-        new UIDropDown.Option("Item Swap", ()->World.Setup.setActorType(ItemSwapper.class))
+      // new UIDropDown("MDP Mode: %s", 
+      //   World.Setup
+      // ),
+      new UIDropDown<Class<? extends Actor>>("Game: %s",
+        World.Setup::getActorType,
+        World.Setup::setActorType,
+        StagHunter.class,
+        ItemSwapper.class
       ),
       new UIButton("Return To Menu", UIController::back),
     },
     UIElement.TRANSITION_SLIDE_LEFT
     );
 
-    UIElement randMove = new ElemList(
+    UIElement randMove = new ElemListVert(
       new Vector2(0.45, 1-UIHelp.calculateListHeight(BUFFER_HEIGHT, COMPON_HEIGHT)), 
       new Vector2(0.55, 1),
       COMPON_HEIGHT, 
@@ -141,9 +143,9 @@ public class UICreator {
       public void init() {
         background = new UIComponent() {
           @Override
-          protected void draw(Graphics2D g, Color... colours) {
+          protected void draw(Graphics2D g, UIColours.ColourSet c) {
             Shape circ = new Ellipse2D.Double(x, y, width, height);
-            g.setColor(colours[UIColours.BACKGROUND]);
+            g.setColor(c.background());
             g.fill(circ);
             g.setColor(a.getTextColour());
             g.setStroke(new BasicStroke(Core.WINDOW.screenHeight()/128));
@@ -170,7 +172,7 @@ public class UICreator {
       }
 
       @Override
-      protected void draw(Graphics2D g, int screenSizeY, Vector2 tL, Vector2 bR, Color[] c, UIInteractable highlighted) {
+      protected void draw(Graphics2D g, int screenSizeY, Vector2 tL, Vector2 bR, UIColours.ColourSet c) {
         tL = tL.add     (BUFFER_HEIGHT*screenSizeY);
         bR = bR.subtract(BUFFER_HEIGHT*screenSizeY);
 
@@ -182,7 +184,7 @@ public class UICreator {
 
         double yInit = rad-Math.sqrt(rad*rad-(buttonWidth*buttonWidth)/4);
 
-        components[0].draw(g, (float)(tL.x)+buttonWidth, (float)(tL.y+yInit), buttonWidth, buttonHeight/2, c[UIColours.TEXT]);
+        components[0].draw(g, (float)(tL.x)+buttonWidth, (float)(tL.y+yInit), buttonWidth, buttonHeight/2, c);
 
         float yOff = ((float)(rad-yInit)*2-buttonHeight)/((components.length+1)/2);
 
@@ -190,10 +192,10 @@ public class UICreator {
           float y = (float)(tL.y+yInit)+yOff*((i+1)/2);
           double xInit = rad-Math.sqrt(rad*rad-Math.pow(mid-y - (mid-y > 0 ? 0 : buttonHeight), 2));
           float x = (float)(i%2==1 ? tL.x+xInit : bR.x-buttonWidth-xInit);
-          components[i].draw(g, x, y, buttonWidth, buttonHeight, components[i] == highlighted ? c[UIColours.BUTTON_HIGHLIGHTED_ACC] : c[UIColours.BUTTON_OUT_ACC], c[UIColours.BUTTON_BODY], c[UIColours.BUTTON_OUT_ACC], c[UIColours.BUTTON_IN_ACC], c[UIColours.BUTTON_LOCKED_BODY]);
+          components[i].draw(g, x, y, buttonWidth, buttonHeight, c);
         }
 
-        components[components.length-1].draw(g, (float)(tL.x)+buttonWidth, (float)(bR.y-yInit)-buttonHeight, buttonWidth, buttonHeight, components[components.length-1] == highlighted ? c[UIColours.BUTTON_HIGHLIGHTED_ACC] : c[UIColours.BUTTON_OUT_ACC], c[UIColours.BUTTON_BODY], c[UIColours.BUTTON_OUT_ACC], c[UIColours.BUTTON_IN_ACC], c[UIColours.BUTTON_LOCKED_BODY]);
+        components[components.length-1].draw(g, (float)(tL.x)+buttonWidth, (float)(bR.y-yInit)-buttonHeight, buttonWidth, buttonHeight, c);
       }
       
     };

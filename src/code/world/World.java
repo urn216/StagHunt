@@ -18,11 +18,13 @@ import mki.ui.control.UIController;
 
 public abstract class World {
   
-  public static final int VI_MODE_DUMB = 0;
-  public static final int VI_MODE_COMP = 1;
-  public static final int VI_MODE_SYMM = 2;
+  public static enum VI_MODE {
+    Naive,
+    CVI,
+    SVI
+  }
 
-  private static double gamma = 0.9;
+  private static double gamma = 0.99;
 
   private static final Stack<State> stateHistory = new Stack<>();
   private static State currentState = null;
@@ -35,7 +37,7 @@ public abstract class World {
   private static ValueIterator.Storage[] actorBrains = new ValueIterator.Storage[0];
   private static MDP[][] actorMDPs = new MDP[0][0];
   
-    private static int VIMode = VI_MODE_COMP;
+  private static VI_MODE VIMode = VI_MODE.CVI;
 
   private static int numMDPIterations = 100;
 
@@ -44,7 +46,8 @@ public abstract class World {
     private static boolean ready = false;
 
     static {
-      setActorType(StagHunter.class);
+      setActorType(PrisonerDilemmee.class);
+      setVIMode(VI_MODE.CVI);
     }
 
     public static double getGamma() {
@@ -77,6 +80,10 @@ public abstract class World {
 
     public static int getActorSize() {
       return actorSize;
+    }
+
+    public static Class<? extends Actor> getActorType() {
+      return World.actorConstructor.getDeclaringClass();
     }
 
     public static void setActorType(Class<? extends Actor> c) {
@@ -119,19 +126,19 @@ public abstract class World {
       World.Setup.ready = false;
     }
 
-    public static int getVIMode() {
+    public static VI_MODE getVIMode() {
       return World.VIMode;
     }
 
-    public static void setVIMode(int VIMode) {
+    public static void setVIMode(VI_MODE VIMode) {
       World.VIMode = VIMode;
       World.Setup.ready = false;
     }
 
     public static void initialiseMDPs() {
       actorMDPs = new MDP
-        [VIMode == VI_MODE_SYMM ? 1 : numActors]
-        [VIMode == VI_MODE_DUMB ? 1 : numActors]
+        [VIMode == VI_MODE.SVI   ? 1 : numActors]
+        [VIMode == VI_MODE.Naive ? 1 : numActors]
       ;
 
       State.Encoder.resetStateTable();
@@ -140,7 +147,7 @@ public abstract class World {
       for (int i = 0; i < actorBrains.length; i++) actorBrains[i] = new ValueIterator.Storage();
       
       for (int i = 0; i < actorMDPs.length; i++) {
-        if (VIMode == VI_MODE_DUMB)
+        if (VIMode == VI_MODE.Naive)
           actorMDPs[i][0] = new OOMDP(gamma, possibleActions, i, i);
         else for (int j = 0; j < actorMDPs[i].length; j++) {
           actorMDPs[i][j] = new OOMDP(gamma, possibleActions, i, j);
@@ -154,15 +161,15 @@ public abstract class World {
       System.out.println("\nValue Iteration:");
       double[][] Vs = new double[numActors][];
       switch(World.VIMode){
-        case VI_MODE_DUMB:
+        case Naive:
         for (int i = 0; i < actorMDPs.length; i++) {
           Vs[i]=(new ValueIterator(actorMDPs[i][0], numMDPIterations, actorBrains[i]).doValueIteration());
         }
         break;
-        case VI_MODE_COMP:
+        case CVI:
         Vs = new ComprehensiveVI(actorMDPs, numMDPIterations, actorBrains).doValueIteration();
         break;
-        case VI_MODE_SYMM:
+        case SVI:
         Vs = new SymmetricVI(actorMDPs[0], numMDPIterations, actorBrains).doValueIteration();
       }
       printVs(Vs);
@@ -244,9 +251,9 @@ public abstract class World {
     private static int pressedActor = -1;
     private static int selectedActor = -1;
 
-    private static double actorRingRadius = 0.36;
-    private static double innerRingRadius = 0.2;
-    private static double actorCircRadius = 0.1;
+    private static double actorRingRadius = 0.3; //0.36
+    private static double innerRingRadius = 0.2; //0.2
+    private static double actorCircRadius = 0.14; //0.1
     private static boolean offset45 = false;
 
     public static double getActorCircRadius() {
