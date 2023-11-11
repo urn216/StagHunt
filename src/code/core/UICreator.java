@@ -86,7 +86,7 @@ public class UICreator {
         10
       ),
       new UIDropDown<World.VI_MODE>("VI Mode: %s", 
-        World.Setup::getVIMode,
+        World.Setup.getVIMode()::toString,
         World.Setup::setVIMode,
         World.VI_MODE.Naive,
         World.VI_MODE.CVI,
@@ -96,7 +96,7 @@ public class UICreator {
       //   World.Setup
       // ),
       new UIDropDown<Class<? extends Actor>>("Game: %s",
-        World.Setup::getActorType,
+        World.Setup.getActorType()::getSimpleName,
         World.Setup::setActorType,
         StagHunter.class,
         ItemSwapper.class
